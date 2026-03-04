@@ -1449,13 +1449,20 @@ function listenMsgs(id){
       }
     });
     if(wasAtBottom||msgs.length<=1)requestAnimationFrame(()=>{box.scrollTop=box.scrollHeight;});
-  },5000);
+  },1500);
 }
 window.sendMsg=async()=>{
   if(!me||!activeConvId)return;
   const inp=$('chatInp');if(!inp)return;
   const text=inp.value.trim();if(!text)return;
   inp.value='';inp.style.height='auto';
+  // Оптимистичный рендер — показываем сообщение сразу, не ждём поллинг
+  const box=$('msgsArea');
+  if(box){
+    const wasAtBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
+    box.innerHTML+=`<div class="msg-row me"><div class="msg-content"><div class="msg-bbl">${esc(text)}</div><div class="msg-time">сейчас</div></div></div>`;
+    if(wasAtBottom)requestAnimationFrame(()=>{box.scrollTop=box.scrollHeight;});
+  }
   await restAdd('conversations/'+activeConvId+'/messages',{text,senderId:me.uid,senderName:me.displayName||me.email.split('@')[0],ts:serverTimestamp()});
   await restUpdate('conversations',activeConvId,{lastMsg:text});
 };
