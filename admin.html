@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameOff Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--acc:#e81c5a;--acc2:#ff4d7e;--bg:#0a0a0a;--card:#141414;--border:#1e1e1e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:#e0e0e0;min-height:100vh;}
+button{cursor:pointer;font-family:inherit;}
+a{text-decoration:none;color:inherit;}
+
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.login-card{background:var(--card);border:1px solid #222;border-radius:18px;padding:40px;width:360px;text-align:center;}
+.login-icon{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;color:#fff;}
+.login-title{font-size:22px;font-weight:800;margin-bottom:4px;}.login-title em{color:var(--acc);font-style:normal;}
+.login-sub{font-size:13px;color:#555;margin-bottom:24px;}
+.l-inp{width:100%;background:#1a1a1a;border:1px solid #222;border-radius:9px;padding:11px 14px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:13px;outline:none;margin-bottom:10px;transition:border-color .2s;}
+.l-inp:focus{border-color:var(--acc);}
+.l-btn{width:100%;padding:12px;border-radius:9px;background:var(--acc);border:none;color:#fff;font-size:14px;font-weight:700;transition:all .2s;}
+.l-btn:hover{background:var(--acc2);}
+.l-err{color:#ff4d6d;font-size:12px;margin-top:8px;display:none;}
+.l-err.on{display:block;}
+
+/* LAYOUT */
+#adminApp{display:none;min-height:100vh;}
+.sidebar{width:220px;background:#0d0d0d;border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;}
+.sb-logo{padding:20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sb-logo-ico{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
+.sb-logo-txt{font-size:16px;font-weight:800;}.sb-logo-txt em{color:var(--acc);font-style:normal;}
+.sb-admin-badge{font-size:9px;background:var(--acc);color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;vertical-align:middle;}
+.sb-nav{padding:8px 0;flex:1;overflow-y:auto;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;color:#555;font-size:13px;font-weight:500;border-left:3px solid transparent;transition:all .2s;}
+.sb-item:hover{color:#e0e0e0;background:#1a1a1a;}
+.sb-item.on{color:#fff;background:#1a1a1a;border-left-color:var(--acc);}
+.sb-item i{width:15px;text-align:center;font-size:13px;}
+.sb-cnt{margin-left:auto;background:var(--acc);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;display:none;}
+.sb-cnt.on{display:block;}
+.sb-bottom{padding:14px 18px;border-top:1px solid var(--border);}
+.sb-email{font-size:10px;color:#2a2a2a;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-out{width:100%;padding:8px;border-radius:8px;background:transparent;border:1px solid #252525;color:#444;font-size:12px;font-weight:600;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.sb-out:hover{border-color:var(--acc);color:var(--acc);}
+
+.main{margin-left:220px;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#0d0d0d;border-bottom:1px solid var(--border);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:16px;font-weight:700;display:flex;align-items:center;gap:9px;}
+.topbar-title i{color:var(--acc);}
+.topbar-meta{display:flex;align-items:center;gap:16px;font-size:12px;color:#333;}
+.online{display:flex;align-items:center;gap:5px;}
+.online::before{content:'';width:5px;height:5px;border-radius:50%;background:#4caf50;}
+.content{padding:22px 24px;flex:1;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px;}
+.stat-c{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:14px;}
+.stat-ico{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.stat-ico-acc{background:rgba(232,28,90,.1);color:var(--acc);}
+.stat-ico-list{background:rgba(79,195,247,.1);color:#4fc3f7;}
+.stat-ico-chat{background:rgba(76,175,80,.1);color:#4caf50;}
+.stat-ico-ord{background:rgba(245,166,35,.1);color:#f5a623;}
+.stat-val{font-size:28px;font-weight:800;line-height:1;}
+.stat-lbl{font-size:11px;color:#555;margin-top:3px;}
+.stat-sub{font-size:10px;margin-top:4px;}
+
+/* SECTIONS */
+.tab{display:none;}.tab.on{display:block;}
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.sc-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.sc-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.sc-title i{color:var(--acc);}
+.sc-srch{background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:7px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:12px;outline:none;width:220px;transition:border-color .2s;}
+.sc-srch:focus{border-color:var(--acc);}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;}
+th{padding:9px 16px;font-size:10px;font-weight:700;color:#333;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #1a1a1a;text-align:left;}
+td{padding:11px 16px;font-size:12px;border-bottom:1px solid #111;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#181818;}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;}
+.b-green{background:rgba(76,175,80,.12);color:#4caf50;}
+.b-red{background:rgba(232,28,90,.12);color:var(--acc);}
+.b-yellow{background:rgba(245,166,35,.12);color:#f5a623;}
+.b-gray{background:#1e1e1e;color:#666;}
+.b-blue{background:rgba(79,195,247,.12);color:#4fc3f7;}
+.acts{display:flex;gap:5px;flex-wrap:wrap;}
+.act{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid;transition:all .2s;display:flex;align-items:center;gap:4px;}
+.act-ok{color:#4caf50;border-color:rgba(76,175,80,.25);background:rgba(76,175,80,.07);}
+.act-ok:hover{background:#4caf50;color:#fff;}
+.act-no{color:var(--acc);border-color:rgba(232,28,90,.2);background:rgba(232,28,90,.06);}
+.act-no:hover{background:var(--acc);color:#fff;}
+.act-ban{color:#f5a623;border-color:rgba(245,166,35,.2);background:rgba(245,166,35,.05);}
+.act-ban:hover{background:#f5a623;color:#fff;}
+.act-del{color:#ff7070;border-color:rgba(255,112,112,.2);background:rgba(255,112,112,.05);}
+.act-del:hover{background:#ff7070;color:#fff;}
+.act-v{color:#777;border-color:#252525;background:#1a1a1a;}
+.act-v:hover{border-color:#444;color:#fff;}
+.empty-row td{text-align:center;color:#2a2a2a;padding:32px;font-size:13px;}
+
+/* CHAT MONITOR */
+.cm-grid{display:grid;grid-template-columns:260px 1fr;height:460px;}
+.cm-list{border-right:1px solid var(--border);overflow-y:auto;}
+.cm-ci{padding:11px 14px;cursor:pointer;border-bottom:1px solid #111;transition:background .15s;}
+.cm-ci:hover,.cm-ci.on{background:#1e1e1e;}
+.cm-nm{font-size:12px;font-weight:600;margin-bottom:2px;}
+.cm-lm{font-size:11px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-msgs-wrap{display:flex;flex-direction:column;}
+.cm-nosel{flex:1;display:flex;align-items:center;justify-content:center;color:#222;font-size:13px;}
+.cm-msgs{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
+.cm-msgs::-webkit-scrollbar{width:3px;}
+.cm-msgs::-webkit-scrollbar-thumb{background:#1e1e1e;}
+.cm-msg{max-width:78%;}
+.cm-snm{font-size:10px;color:#333;margin-bottom:2px;font-weight:600;}
+.cm-bbl{background:#1e1e1e;border:1px solid #252525;border-radius:8px;padding:7px 11px;font-size:12px;line-height:1.55;}
+.cm-t{font-size:10px;color:#222;margin-top:2px;}
+
+.toast{position:fixed;bottom:20px;right:20px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;z-index:9999;transform:translateY(60px);opacity:0;transition:all .25s;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.6);}
+.toast.on{transform:translateY(0);opacity:1;}
+
+.site-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;background:#1a1a1a;border:1px solid #252525;color:#666;font-size:12px;font-weight:600;transition:all .2s;}
+.site-btn:hover{border-color:var(--acc);color:var(--acc);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-icon"><i class="fa fa-shield-alt"></i></div>
+    <div class="login-title"><em>Game</em>Off <span class="sb-admin-badge">ADMIN</span></div>
+    <div class="login-sub">Панель управления платформой</div>
+    <input class="l-inp" id="adE" type="email" placeholder="boyzein28@gmail.com" value="boyzein28@gmail.com">
+    <input class="l-inp" id="adP" type="password" placeholder="Пароль администратора" onkeydown="if(event.key==='Enter')adminLogin()">
+    <div class="l-err" id="adErr"></div>
+    <button class="l-btn" onclick="adminLogin()"><i class="fa fa-sign-in-alt" style="margin-right:6px"></i>Войти в панель</button>
+    <div id="fbCheck" style="font-size:11px;color:#444;margin-top:10px;text-align:center"></div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-ico">G</div>
+      <div><div class="sb-logo-txt"><em>Game</em>Off<span class="sb-admin-badge">ADM</span></div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-item on"  onclick="showTab('dash',this)"><i class="fa fa-chart-bar"></i> Дашборд</div>
+      <div class="sb-item"     onclick="showTab('mod',this)"><i class="fa fa-check-circle"></i> Модерация <span class="sb-cnt" id="modBadge">0</span></div>
+      <div class="sb-item"     onclick="showTab('users',this)"><i class="fa fa-users"></i> Пользователи</div>
+      <div class="sb-item"     onclick="showTab('listings',this)"><i class="fa fa-tag"></i> Объявления</div>
+      <div class="sb-item"     onclick="showTab('chats',this)"><i class="fa fa-comments"></i> Чаты</div>
+      <div class="sb-item"     onclick="showTab('orders',this)"><i class="fa fa-shopping-bag"></i> Заказы</div>
+      <div class="sb-item"     onclick="showTab('settings',this)"><i class="fa fa-cog"></i> Настройки</div>
+    </nav>
+    <div class="sb-bottom">
+      <div class="sb-email" id="adEmail">—</div>
+      <button class="sb-out" onclick="doLogout()"><i class="fa fa-sign-out-alt"></i> Выйти</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle"><i class="fa fa-chart-bar"></i> Дашборд</div>
+      <div class="topbar-meta">
+        <div class="online">Firebase подключён</div>
+        <span id="clock"></span>
+        <a href="gameoff.html" target="_blank" class="site-btn"><i class="fa fa-external-link-alt"></i> Открыть сайт</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="tab on" id="tab-dash">
+        <div class="stats-grid">
+          <div class="stat-c"><div class="stat-ico stat-ico-acc"><i class="fa fa-users"></i></div><div><div class="stat-val" id="s-users">—</div><div class="stat-lbl">Пользователей</div><div class="stat-sub" id="s-active" style="color:#4caf50">загрузка...</div></div></div>
+          <div class="stat-c"><div class="stat-ico stat-ico-list"><i class="fa fa-tag"></i></div><div><div class="stat-val" id="s-listings">—</div><div class="stat-lbl">Объявлений</div><div class="stat-sub" id="s-pending" style="color:#f5a623">загрузка...</div></div></div>
+          <div class="stat-c"><div class="stat-ico stat-ico-chat"><i class="fa fa-comments"></i></div><div><div class="stat-val" id="s-chats">—</div><div class="stat-lbl">Чатов</div><div class="stat-sub" style="color:#555">диалогов</div></div></div>
+          <div class="stat-c"><div class="stat-ico stat-ico-ord"><i class="fa fa-shopping-bag"></i></div><div><div class="stat-val" id="s-orders">—</div><div class="stat-lbl">Заказов</div><div class="stat-sub" id="s-paid" style="color:#4caf50">загрузка...</div></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="section-card">
+            <div class="sc-head"><div class="sc-title"><i class="fa fa-clock"></i> Последние регистрации</div></div>
+            <table><thead><tr><th>Пользователь</th><th>Email</th><th>Статус</th><th>Дата</th></tr></thead>
+            <tbody id="dashUsers"><tr class="empty-row"><td colspan="4">Загрузка...</td></tr></tbody></table>
+          </div>
+          <div class="section-card">
+            <div class="sc-head"><div class="sc-title"><i class="fa fa-hourglass-half"></i> Ожидают модерации</div><button class="act act-v" onclick="showTab('mod',document.querySelectorAll('.sb-item')[1])"><i class="fa fa-arrow-right"></i> Перейти</button></div>
+            <table><thead><tr><th>Название</th><th>Игра</th><th>Цена</th><th>Продавец</th></tr></thead>
+            <tbody id="dashPending"><tr class="empty-row"><td colspan="4">Загрузка...</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODERATION -->
+      <div class="tab" id="tab-mod">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-check-circle"></i> Товары на проверке</div><span style="font-size:12px;color:#444">Новые объявления от пользователей</span></div>
+          <table><thead><tr><th>Название</th><th>Игра</th><th>Тип</th><th>Цена</th><th>Продавец</th><th>Описание</th><th>Действие</th></tr></thead>
+          <tbody id="modTable"><tr class="empty-row"><td colspan="7">Нет объявлений на проверке</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="tab" id="tab-users">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-users"></i> Все пользователи</div><input class="sc-srch" placeholder="Поиск по имени / email..." oninput="filterUsers(this.value)"></div>
+          <table><thead><tr><th>Имя</th><th>Email</th><th>Роль</th><th>Статус</th><th>Регистрация</th><th>Действия</th></tr></thead>
+          <tbody id="usersTable"><tr class="empty-row"><td colspan="6">Загрузка...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- LISTINGS -->
+      <div class="tab" id="tab-listings">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-tag"></i> Все объявления</div><input class="sc-srch" placeholder="Поиск..." oninput="filterListings(this.value)"></div>
+          <table><thead><tr><th>Название</th><th>Игра</th><th>Цена</th><th>Продавец</th><th>Статус</th><th>Действия</th></tr></thead>
+          <tbody id="listingsTable"><tr class="empty-row"><td colspan="6">Загрузка...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- CHATS -->
+      <div class="tab" id="tab-chats">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-comments"></i> Мониторинг чатов</div><span style="font-size:12px;color:#444">В реальном времени</span></div>
+          <div class="cm-grid">
+            <div class="cm-list" id="cmList"><div style="padding:20px;text-align:center;color:#222;font-size:12px">Загрузка...</div></div>
+            <div class="cm-msgs-wrap">
+              <div class="cm-nosel" id="cmNoSel">Выберите чат слева</div>
+              <div class="cm-msgs" id="cmMsgs" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="tab" id="tab-orders">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-shopping-bag"></i> Все заказы</div></div>
+          <table><thead><tr><th>Товар</th><th>Покупатель</th><th>Сумма</th><th>Статус</th><th>Дата</th></tr></thead>
+          <tbody id="ordersTable"><tr class="empty-row"><td colspan="5">Загрузка...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="tab" id="tab-settings">
+        <!-- ТЕСТ РЕАЛЬНОГО ВРЕМЕНИ -->
+        <div class="section-card" style="border:1px solid rgba(232,28,90,.3)">
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-bolt" style="color:var(--acc)"></i> Тест реального времени</div></div>
+          <div style="padding:16px 20px">
+            <div style="font-size:13px;color:#888;margin-bottom:12px">Напиши что-нибудь — появится на главной странице сайта мгновенно без перезагрузки.</div>
+            <textarea id="announceTxt" placeholder="Например: Сайт работает в тестовом режиме. Спасибо за терпение!" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:10px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:13px;outline:none;resize:vertical;min-height:80px;box-sizing:border-box"></textarea>
+            <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+              <button onclick="saveAnnounce()" style="padding:9px 20px;border-radius:8px;background:var(--acc);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer"><i class="fa fa-paper-plane" style="margin-right:6px"></i>Опубликовать</button>
+              <button onclick="clearAnnounce()" style="padding:9px 20px;border-radius:8px;background:#1a1a1a;border:1px solid #333;color:#888;font-size:13px;font-weight:600;cursor:pointer"><i class="fa fa-times" style="margin-right:6px"></i>Убрать с сайта</button>
+              <span id="announceStatus" style="font-size:12px;color:#555"></span>
+            </div>
+            <div style="margin-top:14px;padding:10px 14px;background:#111;border-radius:8px;border:1px solid #222">
+              <div style="font-size:10px;color:#444;margin-bottom:6px;text-transform:uppercase;font-weight:700">Текущее объявление на сайте:</div>
+              <div id="announcePreview" style="font-size:13px;color:#666;font-style:italic">загружаем...</div>
+            </div>
+          </div>
+        </div>
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-cog"></i> Настройки сайта</div></div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:20px;">
+            <div><div style="font-size:10px;font-weight:700;color:#444;margin-bottom:5px;text-transform:uppercase">Email поддержки</div><input style="width:100%;background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:9px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:13px;outline:none;" value="gameoff.manage@gmail.com"></div>
+            <div><div style="font-size:10px;font-weight:700;color:#444;margin-bottom:5px;text-transform:uppercase">Комиссия (%)</div><input type="number" style="width:100%;background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:9px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:13px;outline:none;" value="5"></div>
+            <div><div style="font-size:10px;font-weight:700;color:#444;margin-bottom:5px;text-transform:uppercase">ИНН</div><input style="width:100%;background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:9px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:13px;outline:none;" value="381207051725"></div>
+            <div><div style="font-size:10px;font-weight:700;color:#444;margin-bottom:5px;text-transform:uppercase">Telegram</div><input style="width:100%;background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:9px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:13px;outline:none;" placeholder="https://t.me/..."></div>
+          </div>
+          <div style="padding:0 20px 20px;display:flex;gap:10px">
+            <button style="padding:9px 20px;border-radius:8px;background:var(--acc);border:none;color:#fff;font-size:13px;font-weight:700;transition:all .2s" onmouseover="this.style.background='var(--acc2)'" onmouseout="this.style.background='var(--acc)'" onclick="tst('Настройки сохранены')"><i class="fa fa-save" style="margin-right:6px"></i>Сохранить</button>
+            <button style="padding:9px 20px;border-radius:8px;background:#1a1a1a;border:1px solid #252525;color:#777;font-size:13px;font-weight:600;transition:all .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'" onclick="tst('Экспорт в разработке')"><i class="fa fa-download" style="margin-right:6px"></i>Экспорт данных</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-fire"></i> Firebase проект</div></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px">
+            <div style="background:#1a1a1a;border-radius:9px;padding:12px"><div style="font-size:10px;color:#333;margin-bottom:3px">PROJECT ID</div><div style="font-size:12px;font-weight:600">gameoff-93b99</div></div>
+            <div style="background:#1a1a1a;border-radius:9px;padding:12px"><div style="font-size:10px;color:#333;margin-bottom:3px">AUTH</div><div style="font-size:12px;font-weight:600">Email/Password</div></div>
+            <div style="background:#1a1a1a;border-radius:9px;padding:12px"><div style="font-size:10px;color:#333;margin-bottom:3px">СТАТУС</div><div style="font-size:12px;font-weight:600;color:#4caf50" id="fbStatus"><i class="fa fa-circle" style="font-size:8px;margin-right:4px"></i>Проверяем...</div></div>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title"><i class="fa fa-plus-circle"></i> Добавить тестовый товар</div></div>
+          <div style="padding:16px 20px">
+            <div style="font-size:13px;color:#888;margin-bottom:14px">Добавляет аккаунт Brawl Stars (menzi) напрямую в каталог со статусом approved.</div>
+            <div id="seedResult" style="margin-bottom:12px"></div>
+            <button onclick="seedMenziItem()" style="padding:10px 22px;border-radius:8px;background:var(--acc);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer">
+              <i class="fa fa-plus" style="margin-right:6px"></i>Добавить товар menzi
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore-compat.js"></script>
+<script>
+const FC={apiKey:"AIzaSyCMnA_3RtG39EfV8kSTrNfjNQMX7UC9F6g",authDomain:"gameoff-93b99.firebaseapp.com",projectId:"gameoff-93b99",storageBucket:"gameoff-93b99.firebasestorage.app",messagingSenderId:"964390110488",appId:"1:964390110488:web:a504ba242cf8bdd0d84a6d"};
+firebase.initializeApp(FC);
+const auth=firebase.auth();
+const db=firebase.firestore();
+db.settings({experimentalForceLongPolling:true,merge:true});
+const ADMIN="boyzein28@gmail.com";
+let allUsers=[],allListings=[],allChats=[],allOrders=[],chatMsgUnsub=null;
+
+// Алиасы Firestore
+const col=(name)=>db.collection(name);
+const ref=(colName,id)=>db.collection(colName).doc(id);
+const serverTimestamp=()=>firebase.firestore.FieldValue.serverTimestamp();
+
+function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtD(ts){if(!ts)return'—';try{const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'2-digit',month:'2-digit',year:'2-digit'});}catch{return'—';}}
+
+window.adminLogin=async()=>{
+  const e=document.getElementById('adE').value.trim();
+  const p=document.getElementById('adP').value;
+  const err=document.getElementById('adErr');
+  err.classList.remove('on');
+  if(!e||!p){err.textContent='Введи email и пароль';err.classList.add('on');return;}
+  const btn=document.querySelector('.l-btn');
+  btn.disabled=true;
+  btn.innerHTML='<i class="fa fa-spinner fa-spin" style="margin-right:6px"></i>Входим...';
+  try{
+    await firebase.auth().signInWithEmailAndPassword(e,p);
+  }catch(ex){
+    console.error('Login error:',ex);
+    const m={
+      'auth/user-not-found':'Пользователь не найден',
+      'auth/wrong-password':'Неверный пароль',
+      'auth/invalid-credential':'Неверный email или пароль',
+      'auth/invalid-email':'Неверный email',
+      'auth/too-many-requests':'Слишком много попыток, подожди'
+    };
+    err.textContent=m[ex.code]||('['+ex.code+']: '+ex.message);
+    err.classList.add('on');
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<i class="fa fa-sign-in-alt" style="margin-right:6px"></i>Войти в панель';
+  }
+};
+window.doLogout=()=>firebase.auth().signOut();
+
+// Проверка Firebase при загрузке
+window.addEventListener('load',()=>{
+  const el=document.getElementById('fbCheck');
+  if(!el)return;
+  if(typeof firebase==='undefined'){
+    el.style.color='#ff6b6b';
+    el.textContent='❌ Firebase не загружен — проверь интернет';
+  } else {
+    el.style.color='#4caf50';
+    el.textContent='✅ Firebase загружен ('+firebase.SDK_VERSION+')';
+  }
+});
+
+firebase.auth().onAuthStateChanged(user=>{
+  if(user&&user.email===ADMIN){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminApp').style.display='flex';
+    document.getElementById('adEmail').textContent=user.email;
+    loadAll();
+  }else if(user){
+    document.getElementById('loginScreen').innerHTML=`<div style="text-align:center;padding:60px 20px;max-width:380px;margin:auto"><div style="width:64px;height:64px;border-radius:50%;background:rgba(232,28,90,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:var(--acc)"><i class="fa fa-ban"></i></div><div style="font-size:20px;font-weight:700;color:var(--acc);margin-bottom:8px">Доступ запрещён</div><div style="color:#555;font-size:14px;margin-bottom:22px">Эта панель только для администратора GameOff</div><button onclick="signOut(window.__auth)" style="padding:10px 24px;background:var(--acc);border:none;border-radius:9px;color:#fff;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">Выйти</button></div>`;
+    window.__auth=auth;
+  }else{
+    document.getElementById('loginScreen').style.display='flex';
+    document.getElementById('adminApp').style.display='none';
+  }
+});
+
+const TL={skin:'Скин',acc:'Аккаунт',cur:'Валюта',item:'Предмет'};
+const SL={pending:'На проверке',approved:'Активно',rejected:'Отклонено'};
+const SC={pending:'b-yellow',approved:'b-green',rejected:'b-red'};
+
+function loadAll(){
+  db.collection('users').onSnapshot(snap=>{
+    allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));
+    document.getElementById('s-users').textContent=allUsers.length;
+    document.getElementById('s-active').textContent=allUsers.filter(u=>!u.banned).length+' активных';
+    renderDashUsers(); renderUsers(allUsers);
+  });
+  db.collection('listings').onSnapshot(snap=>{
+    allListings=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const pend=allListings.filter(l=>l.status==='pending');
+    document.getElementById('s-listings').textContent=allListings.length;
+    document.getElementById('s-pending').textContent=pend.length+' на проверке';
+    document.getElementById('modBadge').textContent=pend.length;
+    document.getElementById('modBadge').classList.toggle('on',pend.length>0);
+    renderMod(pend); renderListings(allListings); renderDashPending(pend.slice(0,5));
+  });
+  db.collection('conversations').onSnapshot(snap=>{
+    allChats=snap.docs.map(d=>({id:d.id,...d.data()}));
+    document.getElementById('s-chats').textContent=allChats.length;
+    renderCmList(allChats);
+  });
+  db.collection('orders').onSnapshot(snap=>{
+    allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    document.getElementById('s-orders').textContent=allOrders.length;
+    document.getElementById('s-paid').textContent=allOrders.filter(o=>o.status==='paid').length+' оплачено';
+    renderOrders(allOrders);
+  });
+}
+
+function renderDashUsers(){
+  const tb=document.getElementById('dashUsers');
+  const u=[...allUsers].reverse().slice(0,6);
+  if(!u.length){tb.innerHTML='<tr class="empty-row"><td colspan="4">Нет пользователей</td></tr>';return;}
+  tb.innerHTML=u.map(u=>`<tr><td><strong>${esc(u.name||'—')}</strong></td><td style="color:#555;font-size:11px">${esc(u.email||'—')}</td><td><span class="badge ${u.banned?'b-red':'b-green'}">${u.banned?'Заблокирован':'Активен'}</span></td><td style="color:#444">${fmtD(u.createdAt)}</td></tr>`).join('');
+}
+function renderDashPending(items){
+  const tb=document.getElementById('dashPending');
+  if(!items.length){tb.innerHTML='<tr class="empty-row"><td colspan="4">Нет ожидающих</td></tr>';return;}
+  tb.innerHTML=items.map(l=>`<tr><td><strong>${esc(l.n||'—')}</strong></td><td style="color:#555">${esc(l.g||'—')}</td><td style="color:#f5a623;font-weight:700">${(l.p||0).toLocaleString('ru')} руб.</td><td>${esc(l.s||'—')}</td></tr>`).join('');
+}
+function renderMod(items){
+  const tb=document.getElementById('modTable');
+  if(!items.length){tb.innerHTML='<tr class="empty-row"><td colspan="7">Нет объявлений на проверке — всё чисто!</td></tr>';return;}
+  tb.innerHTML=items.map(l=>`<tr>
+    <td><strong>${esc(l.n||'—')}</strong></td>
+    <td style="color:#555">${esc(l.g||'—')}</td>
+    <td><span class="badge b-gray">${TL[l.t]||'—'}</span></td>
+    <td style="color:#f5a623;font-weight:700">${(l.p||0).toLocaleString('ru')} руб.</td>
+    <td>${esc(l.s||'—')}</td>
+    <td style="color:#444;font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.desc||'—')}</td>
+    <td><div class="acts">
+      <button class="act act-ok" onclick="approve('${l.id}')"><i class="fa fa-check"></i> Одобрить</button>
+      <button class="act act-no" onclick="reject('${l.id}')"><i class="fa fa-times"></i> Отклонить</button>
+    </div></td>
+  </tr>`).join('');
+}
+function renderUsers(users){
+  const tb=document.getElementById('usersTable');
+  if(!users.length){tb.innerHTML='<tr class="empty-row"><td colspan="6">Нет пользователей</td></tr>';return;}
+  tb.innerHTML=users.map(u=>`<tr>
+    <td><strong>${esc(u.name||'—')}</strong></td>
+    <td style="color:#555;font-size:11px">${esc(u.email||'—')}</td>
+    <td><span class="badge ${u.role==='admin'?'b-red':'b-gray'}">${u.role||'user'}</span></td>
+    <td><span class="badge ${u.banned?'b-red':'b-green'}">${u.banned?'Заблокирован':'Активен'}</span></td>
+    <td style="color:#444">${fmtD(u.createdAt)}</td>
+    <td><div class="acts">
+      ${u.banned?`<button class="act act-ok" onclick="unban('${u.id}')"><i class="fa fa-unlock"></i> Разбан</button>`:`<button class="act act-ban" onclick="ban('${u.id}')"><i class="fa fa-ban"></i> Бан</button>`}
+      <button class="act act-del" onclick="delUser('${u.id}')"><i class="fa fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+function renderListings(items){
+  const tb=document.getElementById('listingsTable');
+  if(!items.length){tb.innerHTML='<tr class="empty-row"><td colspan="6">Нет объявлений</td></tr>';return;}
+  tb.innerHTML=items.map(l=>`<tr>
+    <td><strong>${esc(l.n||'—')}</strong></td>
+    <td style="color:#555">${esc(l.g||'—')}</td>
+    <td style="color:#f5a623;font-weight:700">${(l.p||0).toLocaleString('ru')} руб.</td>
+    <td>${esc(l.s||'—')}</td>
+    <td><span class="badge ${SC[l.status]||'b-gray'}">${SL[l.status]||'—'}</span></td>
+    <td><div class="acts">
+      ${l.status==='pending'?`<button class="act act-ok" onclick="approve('${l.id}')"><i class="fa fa-check"></i></button><button class="act act-no" onclick="reject('${l.id}')"><i class="fa fa-times"></i></button>`:''}
+      <button class="act act-del" onclick="delListing('${l.id}')"><i class="fa fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+function renderOrders(orders){
+  const tb=document.getElementById('ordersTable');
+  if(!orders.length){tb.innerHTML='<tr class="empty-row"><td colspan="5">Нет заказов</td></tr>';return;}
+  tb.innerHTML=[...orders].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>`<tr>
+    <td><strong>${esc(o.itemName||'—')}</strong></td>
+    <td style="color:#555;font-size:11px">${esc(o.buyerEmail||'—')}</td>
+    <td style="color:#f5a623;font-weight:700">${(o.amount||0).toLocaleString('ru')} руб.</td>
+    <td><span class="badge ${o.status==='paid'?'b-green':'b-yellow'}">${o.status==='paid'?'Оплачен':'Ожидание'}</span></td>
+    <td style="color:#444">${fmtD(o.createdAt)}</td>
+  </tr>`).join('');
+}
+function renderCmList(chats){
+  const el=document.getElementById('cmList');
+  if(!chats.length){el.innerHTML='<div style="padding:20px;text-align:center;color:#222;font-size:12px">Нет чатов</div>';return;}
+  el.innerHTML=[...chats].sort((a,b)=>(b.lastTime?.seconds||0)-(a.lastTime?.seconds||0)).map(c=>`
+    <div class="cm-ci" id="cmc-${c.id}" onclick="viewCmChat('${c.id}',this)">
+      <div class="cm-nm">${Object.values(c.participantNames||{}).join(' &harr; ')||'—'}</div>
+      <div class="cm-lm">${esc(c.lastMsg||c.itemName||'—')}</div>
+    </div>`).join('');
+}
+window.viewCmChat=function(id,el){
+  document.querySelectorAll('.cm-ci').forEach(x=>x.classList.remove('on'));el.classList.add('on');
+  document.getElementById('cmNoSel').style.display='none';
+  const msgs=document.getElementById('cmMsgs');msgs.style.display='flex';msgs.innerHTML='';
+  if(chatMsgUnsub)chatMsgUnsub();
+  chatMsgUnsub=db.collection('conversations').doc(id).collection('messages').orderBy('ts').onSnapshot(snap=>{
+    msgs.innerHTML='';
+    if(!snap.size){msgs.innerHTML='<div style="padding:20px;color:#222;text-align:center;font-size:12px">Нет сообщений</div>';return;}
+    snap.forEach(d=>{const m=d.data();const t=m.ts?.toDate?new Date(m.ts.toDate()).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}):'';
+      msgs.innerHTML+=`<div class="cm-msg"><div class="cm-snm">${esc(m.senderName||'?')}</div><div class="cm-bbl">${esc(m.text)}</div><div class="cm-t">${t}</div></div>`;});
+    msgs.scrollTop=msgs.scrollHeight;
+  });
+};
+
+window.approve=async id=>{await db.collection('listings').doc(id).update({status:'approved'});tst('Объявление одобрено и опубликовано');};
+window.reject=async id=>{if(!confirm('Отклонить?'))return;await db.collection('listings').doc(id).update({status:'rejected'});tst('Объявление отклонено');};
+
+// ===== ОБЪЯВЛЕНИЕ РЕАЛЬНОГО ВРЕМЕНИ =====
+window.saveAnnounce=async function(){
+  const txt=document.getElementById('announceTxt').value.trim();
+  const status=document.getElementById('announceStatus');
+  if(!txt){status.style.color='#ff6b6b';status.textContent='Введи текст';return;}
+  status.style.color='#888';status.textContent='Сохраняем...';
+  try{
+    await db.collection('config').doc('announce').set({
+      text:txt,
+      active:true,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    status.style.color='#4caf50';status.textContent='✅ Опубликовано!';
+    setTimeout(()=>status.textContent='',3000);
+  }catch(e){
+    status.style.color='#ff6b6b';status.textContent='Ошибка: '+e.message;
+  }
+};
+window.clearAnnounce=async function(){
+  const status=document.getElementById('announceStatus');
+  try{
+    await db.collection('config').doc('announce').set({text:'',active:false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    status.style.color='#4caf50';status.textContent='Убрано с сайта';
+    setTimeout(()=>status.textContent='',3000);
+  }catch(e){
+    status.style.color='#ff6b6b';status.textContent='Ошибка: '+e.message;
+  }
+};
+// Слушаем текущее объявление в реальном времени
+db.collection('config').doc('announce').onSnapshot(snap=>{
+  const el=document.getElementById('announcePreview');
+  if(!el)return;
+  if(snap.exists&&snap.data()?.active&&snap.data()?.text){
+    el.style.color='#e0e0e0';
+    el.textContent=snap.data().text;
+    document.getElementById('announceTxt').value=snap.data().text;
+  } else {
+    el.style.color='#555';
+    el.textContent='Нет активного объявления';
+  }
+});
+
+window.seedMenziItem=async function(){
+  const res=document.getElementById('seedResult');
+  res.innerHTML='<span style="color:#888;font-size:13px"><i class="fa fa-spinner fa-spin" style="margin-right:5px"></i>Добавляем...</span>';
+  try{
+    await db.collection('listings').doc('menzi_brawlstars_acc_001').set({
+      n:'Аккаунт Brawl Stars — 505 кубков',
+      g:'Brawl Stars',
+      t:'acc',
+      r:'epic',
+      p:1000,
+      s:'menzi',
+      sellerId:'5ClrXMvm3ZaM4zODqHrND7Npq7n2',
+      desc:'Аккаунт с 505 кубками. 3 бойца открыты. Новый сезон. Продаю так как не играю. Пишите — договоримся об условиях передачи.',
+      status:'approved',
+      img:'',
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    res.innerHTML='<span style="color:#4caf50;font-size:13px;font-weight:600"><i class="fa fa-check-circle" style="margin-right:5px"></i>Товар успешно добавлен в каталог!</span>';
+    tst('Товар menzi добавлен');
+  }catch(e){
+    res.innerHTML='<span style="color:#ff6b6b;font-size:13px"><i class="fa fa-exclamation-triangle" style="margin-right:5px"></i>Ошибка: '+e.message+'</span>';
+  }
+};
+window.ban=async id=>{if(!confirm('Заблокировать?'))return;await db.collection('users').doc(id).update({banned:true});tst('Пользователь заблокирован');};
+window.unban=async id=>{await db.collection('users').doc(id).update({banned:false});tst('Пользователь разблокирован');};
+window.delUser=async id=>{if(!confirm('Удалить пользователя? Необратимо.'))return;await db.collection('users').doc(id).delete();tst('Удалено');};
+window.delListing=async id=>{if(!confirm('Удалить объявление?'))return;await db.collection('listings').doc(id).delete();tst('Удалено');};
+window.filterUsers=q=>{renderUsers(q?allUsers.filter(u=>(u.name||'').toLowerCase().includes(q.toLowerCase())||(u.email||'').toLowerCase().includes(q.toLowerCase())):allUsers);};
+window.filterListings=q=>{renderListings(q?allListings.filter(l=>(l.n||'').toLowerCase().includes(q.toLowerCase())):allListings);};
+
+const titles={dash:'Дашборд',mod:'Модерация объявлений',users:'Пользователи',listings:'Объявления',chats:'Мониторинг чатов',orders:'Заказы',settings:'Настройки'};
+const icons={dash:'fa-chart-bar',mod:'fa-check-circle',users:'fa-users',listings:'fa-tag',chats:'fa-comments',orders:'fa-shopping-bag',settings:'fa-cog'};
+window.showTab=function(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+name).classList.add('on');el.classList.add('on');
+  document.getElementById('pageTitle').innerHTML=`<i class="fa ${icons[name]}"></i> ${titles[name]}`;
+};
+
+setInterval(()=>{const el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('ru');},1000);
+let _tt;window.tst=m=>{const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('on'),3000);};
+</script>
+</body>
+</html>

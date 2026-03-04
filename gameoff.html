@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameOff — Маркетплейс игровых товаров</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* ===== RESET & BASE ===== */
+:root{
+  --acc:#e81c5a;--acc2:#ff4d7e;--accD:rgba(232,28,90,.12);
+  --bg:#0d0d0d;--bg2:#111;--card:#141414;--card2:#181818;
+  --border:#1e1e1e;--border2:#252525;
+  --text:#e0e0e0;--muted:#888;--dim:#444;
+  --gold:#f5a623;--green:#4caf50;--blue:#4fc3f7;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:inherit;border:none;}
+input,select,textarea{font-family:inherit;}
+img{display:block;max-width:100%;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:#111;}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#383838;}
+
+/* ===== TOPBAR ===== */
+#topbar{
+  background:rgba(17,17,17,.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  display:flex;align-items:center;gap:14px;
+  position:sticky;top:0;z-index:800;height:58px;
+}
+.logo-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo-box{
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border-radius:10px;width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:#fff;letter-spacing:-1px;
+}
+.logo-name{font-size:19px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.logo-name em{color:var(--acc);font-style:normal;}
+.logo-rating{font-size:11px;color:var(--dim);display:flex;align-items:center;gap:3px;}
+.logo-star{color:var(--gold);}
+
+.search-wrap{flex:1;max-width:580px;position:relative;}
+.search-inp{
+  width:100%;background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;padding:9px 38px 9px 14px;
+  color:var(--text);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.search-inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(232,28,90,.08);}
+.search-inp::placeholder{color:var(--dim);}
+.search-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--dim);pointer-events:none;font-size:13px;}
+.search-drop{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;
+  background:var(--card2);border:1px solid var(--border);border-radius:11px;
+  overflow:hidden;z-index:999;box-shadow:0 20px 48px rgba(0,0,0,.75);
+}
+.search-drop.on{display:block;}
+.sd-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s;}
+.sd-item:hover{background:#222;}
+.sd-ico{width:32px;height:32px;border-radius:7px;overflow:hidden;background:#222;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.sd-ico img{width:32px;height:32px;object-fit:cover;}
+.sd-name{font-size:13px;font-weight:600;}.sd-game{font-size:11px;color:var(--muted);}
+.sd-price{margin-left:auto;font-weight:700;color:var(--gold);font-size:12px;white-space:nowrap;}
+
+.tb-gap{flex:1;}
+.tb-nav{display:flex;gap:2px;}
+.tb-nav a{padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted);transition:all .2s;}
+.tb-nav a:hover,.tb-nav a.on{color:var(--text);background:#1e1e1e;}
+.tb-actions{display:flex;gap:8px;align-items:center;}
+.btn-sell{background:var(--acc);border-radius:9px;color:#fff;padding:8px 18px;font-size:13px;font-weight:700;transition:background .2s,transform .15s;display:flex;align-items:center;gap:6px;}
+.btn-sell:hover{background:var(--acc2);transform:translateY(-1px);}
+.btn-login{background:transparent;border:1px solid var(--border2);border-radius:9px;color:var(--muted);padding:8px 15px;font-size:13px;font-weight:600;transition:all .2s;}
+.btn-login:hover{border-color:var(--dim);color:var(--text);}
+.u-chip{
+  display:none;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);border-radius:9px;
+  padding:6px 13px;cursor:pointer;transition:border-color .2s;
+}
+.u-chip:hover{border-color:var(--acc);}
+.u-ava{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.u-chip-name{font-size:13px;font-weight:600;}
+
+/* ===== PAGE SYSTEM ===== */
+.page{display:none;min-height:calc(100vh - 58px);}
+.page.on{display:block;}
+
+/* ===== HERO ===== */
+.hero{
+  background:linear-gradient(160deg,#0f0a12 0%,#120810 40%,#0d0d0d 100%);
+  border-bottom:1px solid var(--border);
+  padding:52px 28px 44px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-80px;right:-80px;
+  width:420px;height:420px;
+  background:radial-gradient(circle,rgba(232,28,90,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-60px;left:10%;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(232,28,90,.04) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{max-width:1260px;margin:0 auto;position:relative;z-index:1;}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--accD);border:1px solid rgba(232,28,90,.2);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--acc);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px;}
+.hero h1{font-size:42px;font-weight:800;line-height:1.15;margin-bottom:12px;letter-spacing:-1px;}
+.hero h1 em{color:var(--acc);font-style:normal;}
+.hero-sub{font-size:15px;color:var(--muted);margin-bottom:32px;max-width:520px;line-height:1.7;}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px;}
+.hero-btn-primary{background:var(--acc);color:#fff;border-radius:11px;padding:12px 28px;font-size:15px;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:8px;}
+.hero-btn-primary:hover{background:var(--acc2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,28,90,.3);}
+.hero-btn-sec{background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:11px;padding:12px 24px;font-size:15px;font-weight:600;transition:all .2s;}
+.hero-btn-sec:hover{border-color:var(--dim);color:var(--text);}
+.hero-stats{display:flex;gap:32px;flex-wrap:wrap;}
+.hs-item{}.hs-val{font-size:28px;font-weight:800;color:var(--text);}.hs-val span{color:var(--acc);}
+.hs-lbl{font-size:12px;color:var(--dim);margin-top:2px;}
+
+/* ===== MAIN LAYOUT ===== */
+.main-wrap{max-width:1260px;margin:0 auto;padding:28px 24px 80px;}
+
+/* ===== SECTION HEADERS ===== */
+.sec-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-title{font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:9px;}
+.sec-title i{color:var(--acc);font-size:15px;}
+.sec-link{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:4px;transition:color .2s;}
+.sec-link:hover{color:var(--acc);}
+
+/* ===== GAME TILES ===== */
+.games-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:34px;}
+.g-tile{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;width:78px;transition:transform .2s;}
+.g-tile:hover{transform:translateY(-3px);}
+.g-tile.on .g-img-wrap{outline:2px solid var(--acc);outline-offset:2px;box-shadow:0 0 16px rgba(232,28,90,.25);}
+.g-img-wrap{width:68px;height:68px;border-radius:16px;overflow:hidden;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+.g-img-wrap img{width:68px;height:68px;object-fit:cover;}
+.g-name{font-size:10px;color:var(--muted);text-align:center;line-height:1.35;font-weight:500;}
+
+/* ===== FILTER BAR ===== */
+.filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.fc-btn{padding:6px 15px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;font-weight:600;transition:all .2s;}
+.fc-btn:hover,.fc-btn.on{border-color:var(--acc);color:var(--acc);background:var(--accD);}
+.f-label{font-size:12px;color:var(--dim);font-weight:600;}
+.f-select{background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 11px;font-size:12px;outline:none;cursor:pointer;transition:border-color .2s;}
+.f-select:focus{border-color:var(--acc);}
+
+/* ===== LISTING CARDS ===== */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(218px,1fr));gap:14px;margin-bottom:48px;}
+.lcard{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;transition:all .22s;cursor:pointer;}
+.lcard:hover{border-color:rgba(232,28,90,.35);transform:translateY(-5px);box-shadow:0 14px 36px rgba(0,0,0,.55);}
+.lcard-thumb{height:144px;background:var(--card2);position:relative;overflow:hidden;}
+.lcard-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.3;transition:opacity .3s;}
+.lcard:hover .lcard-bg{opacity:.45;}
+.lcard-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.65));}
+.lcard-thumb-ico{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
+.lcard-thumb-ico i{font-size:44px;color:rgba(255,255,255,.08);}
+.lcard-gtag{position:absolute;top:9px;left:9px;z-index:3;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);border-radius:6px;padding:3px 9px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.06);}
+.lcard-gtag img{width:14px;height:14px;border-radius:3px;object-fit:cover;}
+.lcard-fav{position:absolute;top:8px;right:8px;z-index:3;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.07);color:var(--dim);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.lcard-fav:hover{color:var(--acc);transform:scale(1.1);}
+.lcard-body{padding:12px;}
+.lcard-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:7px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lcard-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;}
+.ltag{font-size:10px;padding:2px 7px;border-radius:5px;font-weight:600;background:#1e1e1e;color:var(--muted);}
+.ltag.rare{background:rgba(79,195,247,.1);color:var(--blue);}
+.ltag.epic{background:rgba(186,104,200,.1);color:#ce93d8;}
+.ltag.leg{background:rgba(245,166,35,.1);color:var(--gold);}
+.lcard-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;}
+.lcard-price{font-size:20px;font-weight:800;color:var(--gold);line-height:1;}
+.lcard-price small{font-size:10px;color:var(--dim);display:block;font-weight:400;margin-top:2px;}
+.lcard-seller{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim);}
+.seller-av{width:18px;height:18px;border-radius:50%;background:#252525;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--muted);}
+.lcard-buy{width:100%;padding:9px;border-radius:9px;background:var(--acc);color:#fff;font-size:13px;font-weight:700;transition:all .2s;}
+.lcard-buy:hover{background:var(--acc2);}
+.lcard-chat{width:100%;padding:7px;border-radius:9px;margin-top:6px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;}
+.lcard-chat:hover{border-color:var(--dim);color:var(--text);}
+
+/* ===== CATALOG PAGE ===== */
+.cat-layout{display:grid;grid-template-columns:250px 1fr;gap:22px;align-items:start;}
+.cat-sidebar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;position:sticky;top:72px;}
+.csb-sec{margin-bottom:20px;}
+.csb-title{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
+.csb-game{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;cursor:pointer;transition:background .15s;border-left:2px solid transparent;}
+.csb-game:hover{background:#1a1a1a;}
+.csb-game.on{background:#1a1a1a;border-left-color:var(--acc);}
+.csb-game img{width:26px;height:26px;border-radius:6px;object-fit:cover;flex-shrink:0;}
+.csb-gname{font-size:12px;font-weight:500;flex:1;}
+.csb-cnt{font-size:10px;color:var(--dim);background:#1a1a1a;padding:1px 6px;border-radius:4px;}
+.csb-type-btn{display:flex;align-items:center;gap:7px;width:100%;padding:7px 10px;border-radius:8px;background:transparent;font-size:12px;font-weight:500;color:var(--muted);border-left:2px solid transparent;transition:all .15s;text-align:left;}
+.csb-type-btn:hover{background:#1a1a1a;color:var(--text);}
+.csb-type-btn.on{background:#1a1a1a;border-left-color:var(--acc);color:#fff;}
+.price-row{display:flex;gap:8px;align-items:center;}
+.price-inp{flex:1;background:#1a1a1a;border:1px solid #222;border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;outline:none;width:0;}
+.price-inp:focus{border-color:var(--acc);}
+.price-dash{color:var(--dim);font-size:11px;}
+.apply-btn{width:100%;padding:8px;border-radius:8px;background:var(--acc);color:#fff;font-size:12px;font-weight:700;margin-top:11px;transition:background .2s;}
+.apply-btn:hover{background:var(--acc2);}
+.cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap;}
+.cat-count{font-size:12px;color:var(--dim);}
+.sort-sel{background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:7px 12px;font-size:12px;outline:none;cursor:pointer;}
+.sort-sel:focus{border-color:var(--acc);}
+.empty-state{text-align:center;padding:60px 20px;color:var(--dim);}
+.empty-state i{font-size:40px;margin-bottom:14px;display:block;color:#222;}
+.empty-state h3{font-size:15px;font-weight:600;margin-bottom:6px;color:var(--muted);}
+
+/* ===== CHATS PAGE ===== */
+.chat-layout{display:grid;grid-template-columns:300px 1fr;height:calc(100vh - 58px);}
+.chat-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;background:#0f0f0f;}
+.chatsb-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.chatsb-title{font-size:15px;font-weight:700;}
+.chatsb-newbtn{width:30px;height:30px;border-radius:8px;background:#1a1a1a;border:1px solid var(--border2);color:var(--dim);font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.chatsb-newbtn:hover{border-color:var(--acc);color:var(--acc);}
+.chatsb-search{padding:10px 14px;border-bottom:1px solid #111;}
+.chatsb-search input{width:100%;background:#181818;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:var(--text);font-size:12px;outline:none;}
+.chatsb-search input:focus{border-color:var(--acc);}
+.conv-list{flex:1;overflow-y:auto;}
+.conv-item{display:flex;align-items:center;gap:11px;padding:12px 16px;cursor:pointer;border-bottom:1px solid #0f0f0f;transition:background .15s;}
+.conv-item:hover,.conv-item.on{background:#1a1a1a;}
+.conv-item.on{border-left:2px solid var(--acc);}
+.conv-ava{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--acc),#ff8c42);color:#fff;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.conv-info{flex:1;min-width:0;}
+.conv-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.conv-last{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.conv-time{font-size:10px;color:#2a2a2a;flex-shrink:0;}
+.conv-empty{padding:32px 16px;text-align:center;color:#2a2a2a;font-size:13px;line-height:1.7;}
+.conv-empty i{font-size:32px;display:block;margin-bottom:10px;}
+/* chat window */
+.chat-win{display:flex;flex-direction:column;background:var(--bg);}
+.chat-win.empty{align-items:center;justify-content:center;}
+.chat-win-empty{text-align:center;color:#1e1e1e;}
+.chat-win-empty i{font-size:52px;display:block;margin-bottom:14px;}
+.chat-win-empty p{font-size:14px;line-height:1.7;}
+.cwin-head{padding:12px 20px;border-bottom:1px solid var(--border);background:#111;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.cwin-ava{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4fc3f7,#7c4dff);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cwin-name{font-size:14px;font-weight:700;}
+.cwin-status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;margin-top:1px;}
+.cwin-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);}
+.cwin-item{margin-left:auto;font-size:11px;color:var(--dim);display:flex;align-items:center;gap:5px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.msgs-area{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;}
+.msgs-area::-webkit-scrollbar{width:3px;}
+.msgs-area::-webkit-scrollbar-thumb{background:#1a1a1a;}
+.date-sep{text-align:center;margin:4px 0;}
+.date-sep span{font-size:10px;color:#2a2a2a;background:#0f0f0f;padding:3px 10px;border-radius:8px;border:1px solid #1a1a1a;}
+.msg-row{display:flex;gap:8px;max-width:70%;}
+.msg-row.me{align-self:flex-end;flex-direction:row-reverse;}
+.msg-av{width:28px;height:28px;border-radius:50%;background:#1e1e1e;color:var(--muted);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end;}
+.msg-content{}
+.msg-sender{font-size:10px;color:var(--dim);margin-bottom:3px;font-weight:600;}
+.msg-bbl{background:#1e1e1e;border:1px solid #282828;border-radius:13px 13px 13px 3px;padding:9px 13px;font-size:13px;line-height:1.55;word-break:break-word;}
+.msg-row.me .msg-bbl{background:var(--accD);border-color:rgba(232,28,90,.2);border-radius:13px 13px 3px 13px;}
+.msg-time{font-size:10px;color:#282828;margin-top:3px;}
+.msg-row.me .msg-time{text-align:right;}
+.chat-inp-row{padding:12px 16px;border-top:1px solid var(--border);background:#0f0f0f;display:flex;gap:9px;align-items:flex-end;flex-shrink:0;}
+.chat-textarea{flex:1;background:#181818;border:1px solid #1e1e1e;border-radius:10px;padding:9px 13px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;resize:none;max-height:110px;line-height:1.5;transition:border-color .2s;}
+.chat-textarea:focus{border-color:var(--acc);}
+.chat-send{width:38px;height:38px;border-radius:10px;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;}
+.chat-send:hover{background:var(--acc2);}
+
+/* ===== ACCOUNT PAGE ===== */
+.acc-layout{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start;}
+.acc-nav{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:sticky;top:72px;}
+.acc-nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-left:3px solid transparent;transition:all .2s;}
+.acc-nav-item:hover{color:var(--text);background:#1a1a1a;}
+.acc-nav-item.on{color:#fff;background:#1a1a1a;border-left-color:var(--acc);}
+.acc-nav-item i{width:16px;text-align:center;}
+.acc-nav-danger{color:var(--acc)!important;border-top:1px solid var(--border);}
+.acc-section{display:none;}
+.acc-section.on{display:block;}
+.acc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;}
+.acc-card-title{font-size:14px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.acc-card-title i{color:var(--acc);}
+.profile-head{display:flex;align-items:center;gap:18px;margin-bottom:24px;}
+.big-ava{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;}
+.profile-meta h2{font-size:20px;font-weight:700;margin-bottom:3px;}
+.profile-meta p{font-size:13px;color:var(--muted);}
+.seller-badge{display:inline-flex;align-items:center;gap:5px;background:var(--accD);border:1px solid rgba(232,28,90,.2);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;color:var(--acc);margin-top:7px;}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.stat-b{background:#1a1a1a;border-radius:10px;padding:14px;text-align:center;}
+.stat-b-val{font-size:24px;font-weight:800;color:var(--acc);}
+.stat-b-lbl{font-size:11px;color:var(--dim);margin-top:3px;}
+.form-group{margin-bottom:13px;}
+.form-group label{display:block;font-size:10px;font-weight:700;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+.form-group input{width:100%;background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:10px 13px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.form-group input:focus{border-color:var(--acc);}
+.form-group input:disabled{color:var(--dim);cursor:not-allowed;}
+.save-btn{padding:9px 22px;border-radius:8px;background:var(--acc);color:#fff;font-size:13px;font-weight:700;transition:all .2s;}
+.save-btn:hover{background:var(--acc2);}
+.danger-btn{padding:9px 22px;border-radius:8px;background:transparent;border:1px solid rgba(232,28,90,.25);color:var(--acc);font-size:13px;font-weight:600;transition:all .2s;}
+.danger-btn:hover{background:var(--acc);color:#fff;}
+.listing-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1a1a1a;}
+.listing-item:last-child{border-bottom:none;}
+.li-info{flex:1;}
+.li-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.li-sub{font-size:11px;color:var(--muted);}
+.li-price{font-weight:700;color:var(--gold);white-space:nowrap;}
+.status-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;white-space:nowrap;}
+.st-pending{background:rgba(245,166,35,.1);color:var(--gold);}
+.st-approved{background:rgba(76,175,80,.1);color:var(--green);}
+.st-rejected{background:rgba(232,28,90,.1);color:var(--acc);}
+.empty-acc{padding:28px;text-align:center;color:var(--dim);font-size:13px;line-height:1.7;}
+.empty-acc i{font-size:28px;display:block;margin-bottom:10px;color:#222;}
+
+/* ===== LEGAL PAGES ===== */
+.legal-wrap{max-width:820px;margin:0 auto;padding:32px 24px 80px;}
+.legal-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:38px 42px;}
+.legal-hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.legal-title{font-size:24px;font-weight:700;margin-bottom:7px;}
+.legal-date{font-size:12px;color:var(--dim);}
+.legal-sec{margin-bottom:26px;}
+.legal-sec h2{font-size:14px;font-weight:700;color:var(--acc);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.legal-sec p,.legal-sec li{font-size:13px;color:#999;line-height:1.85;margin-bottom:6px;}
+.legal-sec ul,.legal-sec ol{padding-left:18px;margin-top:6px;}
+.legal-hl{background:#1a1a1a;border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13px;color:#aaa;line-height:1.7;}
+
+/* ===== MODALS ===== */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .22s;}
+.overlay.on{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border:1px solid #222;border-radius:15px;padding:28px;width:100%;max-width:430px;position:relative;transform:translateY(12px) scale(.97);transition:transform .22s;max-height:92vh;overflow-y:auto;}
+.overlay.on .modal{transform:translateY(0) scale(1);}
+.modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;background:#1e1e1e;border:1px solid #282828;color:var(--muted);font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.modal-close:hover{color:#fff;border-color:var(--dim);}
+.modal-logo{text-align:center;font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-.5px;}
+.modal-logo em{color:var(--acc);font-style:normal;}
+.modal-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:20px;}
+.modal-tabs{display:flex;gap:3px;background:#1a1a1a;border-radius:9px;padding:3px;margin-bottom:18px;}
+.modal-tab{flex:1;padding:8px;border-radius:7px;background:transparent;color:var(--dim);font-size:13px;font-weight:600;transition:all .2s;}
+.modal-tab.on{background:var(--acc);color:#fff;}
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:10px;font-weight:700;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+.fg input,.fg select,.fg textarea{width:100%;background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:10px 13px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(232,28,90,.07);}
+.fg textarea{resize:vertical;min-height:72px;}
+.modal-btn{width:100%;padding:12px;border-radius:9px;background:var(--acc);color:#fff;font-size:14px;font-weight:700;margin-top:6px;transition:all .2s;}
+.modal-btn:hover{background:var(--acc2);}
+.err-msg{color:#ff4d6d;font-size:12px;margin-top:5px;display:none;}
+.err-msg.on{display:block;}
+.ok-msg{color:var(--green);font-size:12px;margin-top:5px;display:none;}
+.ok-msg.on{display:block;}
+
+/* pay modal */
+.pay-item{background:#1a1a1a;border:1px solid #222;border-radius:10px;padding:13px 15px;display:flex;align-items:center;gap:13px;margin-bottom:18px;}
+.pay-item-ico{width:44px;height:44px;border-radius:9px;overflow:hidden;background:#222;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.pay-item-ico img{width:44px;height:44px;object-fit:cover;}
+.pay-item-name{font-weight:700;font-size:13px;line-height:1.4;}
+.pay-item-game{font-size:11px;color:var(--muted);}
+.pay-item-price{margin-left:auto;font-size:22px;font-weight:800;color:var(--gold);white-space:nowrap;}
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px;}
+.pm-btn{padding:10px 6px;background:#1a1a1a;border:2px solid #1e1e1e;border-radius:9px;color:var(--muted);font-size:10px;font-weight:700;text-align:center;transition:all .2s;line-height:1.8;}
+.pm-btn:hover,.pm-btn.on{border-color:var(--acc);color:var(--text);background:var(--accD);}
+.pm-btn svg{display:block;margin:0 auto 3px;}
+.pay-total{display:flex;justify-content:space-between;align-items:center;background:#1a1a1a;border-radius:9px;padding:12px 15px;margin-bottom:14px;}
+.pay-total-lbl{font-size:12px;color:var(--muted);}
+.pay-total-val{font-size:26px;font-weight:800;color:var(--green);}
+.pay-wait{text-align:center;padding:18px 0;display:none;}
+.pay-wait.on{display:block;}
+.pay-spinner{width:38px;height:38px;border:3px solid #222;border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pay-note{text-align:center;font-size:11px;color:#2a2a2a;margin-top:8px;}
+
+/* ===== BREADCRUMB ===== */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--dim);margin-bottom:20px;}
+.breadcrumb a{color:var(--dim);transition:color .2s;}
+.breadcrumb a:hover{color:var(--acc);}
+.breadcrumb i{font-size:9px;}
+
+/* ===== FOOTER ===== */
+footer{background:#0e0e0e;border-top:1px solid #1a1a1a;padding:36px 28px 20px;}
+.footer-grid{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:24px;}
+.fc-col h4{font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;}
+.fc-col a{display:block;font-size:12px;color:var(--dim);margin-bottom:7px;transition:color .2s;}
+.fc-col a:hover{color:var(--acc);}
+.fc-col p{font-size:11px;color:#2a2a2a;}
+.pay-badges-ft{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
+.pay-bdg{background:#181818;border:1px solid #1e1e1e;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--dim);}
+.soc-row-ft{display:flex;gap:8px;margin-top:7px;}
+.soc-ico{width:36px;height:36px;border-radius:9px;background:#181818;border:1px solid #1e1e1e;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:16px;transition:all .2s;}
+.soc-ico:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-2px);}
+.footer-bot{max-width:1260px;margin:0 auto;border-top:1px solid #1a1a1a;padding-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#2a2a2a;}
+.footer-logo{font-size:15px;font-weight:800;color:#333;}
+.footer-logo em{color:var(--acc);font-style:normal;}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(70px);background:#1e1e1e;border:1px solid #2a2a2a;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .28s;white-space:nowrap;box-shadow:0 10px 28px rgba(0,0,0,.7);}
+.toast.on{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  .cat-layout{grid-template-columns:1fr;}
+  .cat-sidebar{position:static;}
+  .chat-layout{grid-template-columns:1fr;}
+  .acc-layout{grid-template-columns:1fr;}
+  .acc-nav{position:static;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  .hero h1{font-size:28px;}
+}
+@media(max-width:600px){
+  #topbar{padding:0 14px;gap:8px;}
+  .search-wrap{display:none;}
+  .main-wrap{padding:18px 14px 60px;}
+  .legal-card{padding:22px 18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TOPBAR ===== -->
+<div id="topbar">
+  <div class="logo-wrap" style="cursor:pointer" onclick="nav('home')">
+    <div class="logo-box">G</div>
+    <div>
+      <div class="logo-name"><em>Game</em>Off</div>
+    </div>
+    <div class="logo-rating"><span class="logo-star">&#9733;</span> 5.0</div>
+  </div>
+
+  <div class="search-wrap">
+    <input class="search-inp" id="searchInp" placeholder="Поиск скинов, аккаунтов, валюты..." autocomplete="off">
+    <i class="fa fa-search search-icon"></i>
+    <div class="search-drop" id="searchDrop"></div>
+  </div>
+
+  <div class="tb-gap"></div>
+
+  <nav class="tb-nav">
+    <a id="nav-home"    onclick="nav('home')"    class="on">Главная</a>
+    <a id="nav-catalog" onclick="nav('catalog')">Каталог</a>
+    <a id="nav-chats"   onclick="nav('chats')">Чаты</a>
+  </nav>
+
+  <div class="tb-actions">
+    <button class="btn-sell" onclick="openSell()"><i class="fa fa-plus"></i> Продать</button>
+    <button class="btn-login" id="loginBtn" onclick="openModal('authMd')">Войти</button>
+    <div class="u-chip" id="uChip" onclick="nav('account')">
+      <div class="u-ava" id="uAva">?</div>
+      <span class="u-chip-name" id="uName">Аккаунт</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HOME PAGE ===== -->
+<div class="page on" id="page-home">
+  <!-- БАННЕР АДМИНИСТРАТОРА (реальное время) -->
+  <div id="adminBanner" style="display:none;background:linear-gradient(90deg,rgba(232,28,90,.15),rgba(232,28,90,.05));border-bottom:1px solid rgba(232,28,90,.25);padding:10px 20px;text-align:center;font-size:13px;font-weight:600;color:#ff8aaa">
+    <i class="fa fa-bullhorn" style="margin-right:8px;color:var(--acc)"></i>
+    <span id="adminBannerText"></span>
+  </div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag"><i class="fa fa-shield-alt"></i> Безопасные сделки</div>
+      <h1>Торгуй игровыми<br>товарами на <em>GameOff</em></h1>
+      <p class="hero-sub">Скины, аккаунты, валюта — всё в одном месте. Быстро, безопасно, надёжно.</p>
+      <div class="hero-actions">
+        <button class="hero-btn-primary" onclick="nav('catalog')"><i class="fa fa-search"></i> Смотреть каталог</button>
+        <button class="hero-btn-sec" onclick="openSell()"><i class="fa fa-plus"></i> Разместить товар</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hs-item"><div class="hs-val"><span id="heroListings">—</span></div><div class="hs-lbl">Активных товаров</div></div>
+        <div class="hs-item"><div class="hs-val"><span id="heroUsers">—</span></div><div class="hs-lbl">Пользователей</div></div>
+        <div class="hs-item"><div class="hs-val"><span>100%</span></div><div class="hs-lbl">Безопасных сделок</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+    <div class="sec-row">
+      <div class="sec-title"><i class="fa fa-gamepad"></i> Игры</div>
+      <a class="sec-link" onclick="nav('catalog')">Все <i class="fa fa-chevron-right"></i></a>
+    </div>
+    <div class="games-row" id="homeGames"></div>
+
+    <div class="sec-row">
+      <div class="sec-title"><i class="fa fa-desktop"></i> Платформы</div>
+    </div>
+    <div class="games-row" id="homePlatforms"></div>
+
+    <div class="sec-row" style="margin-top:8px">
+      <div class="sec-title" id="homeListingsTitle"><i class="fa fa-fire"></i> Популярные товары</div>
+      <a class="sec-link" onclick="nav('catalog')">Все товары <i class="fa fa-chevron-right"></i></a>
+    </div>
+    <div class="filter-bar">
+      <span class="f-label">Тип:</span>
+      <button class="fc-btn on" onclick="homeFilter(this,'all')">Все</button>
+      <button class="fc-btn" onclick="homeFilter(this,'skin')">Скины</button>
+      <button class="fc-btn" onclick="homeFilter(this,'acc')">Аккаунты</button>
+      <button class="fc-btn" onclick="homeFilter(this,'cur')">Валюта</button>
+      <button class="fc-btn" onclick="homeFilter(this,'item')">Предметы</button>
+      <select class="f-select" onchange="homeSort(this.value)">
+        <option value="pop">По популярности</option>
+        <option value="asc">Цена: по возрастанию</option>
+        <option value="desc">Цена: по убыванию</option>
+      </select>
+    </div>
+    <div class="cards-grid" id="homeCards"></div>
+  </div>
+
+  <div id="homeFooter"></div>
+</div>
+
+<!-- ===== CATALOG PAGE ===== -->
+<div class="page" id="page-catalog">
+  <div class="main-wrap">
+    <div class="breadcrumb">
+      <a onclick="nav('home')">Главная</a>
+      <i class="fa fa-chevron-right"></i>
+      <span style="color:var(--text)">Каталог</span>
+    </div>
+    <div class="cat-layout">
+      <div class="cat-sidebar">
+        <div class="csb-sec">
+          <div class="csb-title">Игра</div>
+          <div id="catGameFilters"></div>
+        </div>
+        <div class="csb-sec">
+          <div class="csb-title">Тип товара</div>
+          <div id="catTypeFilters"></div>
+        </div>
+        <div class="csb-sec">
+          <div class="csb-title">Цена</div>
+          <div class="price-row">
+            <input class="price-inp" id="prMin" type="number" placeholder="от" min="0">
+            <span class="price-dash">—</span>
+            <input class="price-inp" id="prMax" type="number" placeholder="до" min="0">
+          </div>
+          <button class="apply-btn" onclick="applyPrice()">Применить</button>
+        </div>
+      </div>
+      <div>
+        <div class="cat-head">
+          <div>
+            <div class="sec-title" style="font-size:18px">Все товары</div>
+            <div class="cat-count" id="catCount">Загрузка...</div>
+          </div>
+          <select class="sort-sel" onchange="catSort(this.value)">
+            <option value="pop">По популярности</option>
+            <option value="asc">Цена: по возрастанию</option>
+            <option value="desc">Цена: по убыванию</option>
+            <option value="new">Сначала новые</option>
+          </select>
+        </div>
+        <div class="cards-grid" id="catCards"></div>
+        <div id="catEmpty" class="empty-state" style="display:none">
+          <i class="fa fa-search"></i>
+          <h3>Ничего не найдено</h3>
+          <p style="font-size:13px">Попробуй изменить фильтры</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="catFooter"></div>
+</div>
+
+<!-- ===== CHATS PAGE ===== -->
+<div class="page" id="page-chats" style="overflow:hidden">
+  <div class="chat-layout">
+    <div class="chat-sidebar">
+      <div class="chatsb-head">
+        <div class="chatsb-title">Сообщения</div>
+        <button class="chatsb-newbtn" onclick="showNewChatModal()" title="Новый чат"><i class="fa fa-pen"></i></button>
+      </div>
+      <div class="chatsb-search"><input id="chatSearch" placeholder="Поиск..." oninput="filterConvs(this.value)"></div>
+      <div class="conv-list" id="convList">
+        <div class="conv-empty"><i class="fa fa-lock"></i>Войди чтобы<br>просматривать чаты</div>
+      </div>
+    </div>
+    <div class="chat-win empty" id="chatWin">
+      <div class="chat-win-empty">
+        <i class="fa fa-comments"></i>
+        <p>Выберите чат слева<br>или напиши продавцу<br>со страницы товара</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ACCOUNT PAGE ===== -->
+<div class="page" id="page-account">
+  <div class="main-wrap">
+    <div class="breadcrumb">
+      <a onclick="nav('home')">Главная</a>
+      <i class="fa fa-chevron-right"></i>
+      <span style="color:var(--text)">Мой аккаунт</span>
+    </div>
+    <div id="accLoggedOut" style="display:none;text-align:center;padding:80px 20px">
+      <i class="fa fa-user-lock" style="font-size:48px;color:#222;display:block;margin-bottom:18px"></i>
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">Войдите в аккаунт</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:22px">Чтобы управлять профилем и товарами</div>
+      <button class="btn-sell" style="display:inline-flex;padding:10px 28px;font-size:14px" onclick="openModal('authMd')">Войти / Регистрация</button>
+    </div>
+    <div id="accContent" class="acc-layout">
+      <div class="acc-nav">
+        <div class="acc-nav-item on" onclick="accTab('profile',this)"><i class="fa fa-user"></i> Профиль</div>
+        <div class="acc-nav-item" onclick="accTab('listings',this)"><i class="fa fa-tag"></i> Мои товары</div>
+        <div class="acc-nav-item" onclick="accTab('orders',this)"><i class="fa fa-shopping-bag"></i> Мои покупки</div>
+        <div class="acc-nav-item" onclick="accTab('security',this)"><i class="fa fa-lock"></i> Безопасность</div>
+        <div class="acc-nav-item acc-nav-danger" onclick="doLogout()"><i class="fa fa-sign-out-alt"></i> Выйти</div>
+      </div>
+      <div>
+        <!-- PROFILE -->
+        <div class="acc-section on" id="acc-profile">
+          <div class="acc-card">
+            <div class="profile-head">
+              <div class="big-ava" id="accBigAva">?</div>
+              <div class="profile-meta">
+                <h2 id="accProfileName">—</h2>
+                <p id="accProfileEmail">—</p>
+                <div class="seller-badge"><i class="fa fa-star"></i> Участник GameOff</div>
+              </div>
+            </div>
+            <div class="stats-row">
+              <div class="stat-b"><div class="stat-b-val" id="accStatListings">0</div><div class="stat-b-lbl">Товаров</div></div>
+              <div class="stat-b"><div class="stat-b-val" id="accStatOrders">0</div><div class="stat-b-lbl">Покупок</div></div>
+              <div class="stat-b"><div class="stat-b-val">5.0</div><div class="stat-b-lbl">Рейтинг</div></div>
+            </div>
+          </div>
+          <div class="acc-card">
+            <div class="acc-card-title"><i class="fa fa-edit"></i> Изменить данные</div>
+            <div class="form-group"><label>Никнейм</label><input id="editName" placeholder="ProGamer2024"></div>
+            <div class="form-group"><label>Email</label><input id="editEmail" type="email" disabled></div>
+            <div class="ok-msg" id="profileOk">Данные сохранены</div>
+            <div class="err-msg" id="profileErr"></div>
+            <button class="save-btn" onclick="saveProfile()">Сохранить изменения</button>
+          </div>
+        </div>
+        <!-- LISTINGS -->
+        <div class="acc-section" id="acc-listings">
+          <div class="acc-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+              <div class="acc-card-title" style="margin-bottom:0"><i class="fa fa-tag"></i> Мои объявления</div>
+              <button class="save-btn" style="font-size:12px;padding:7px 16px" onclick="openSell()"><i class="fa fa-plus"></i> Добавить</button>
+            </div>
+            <div id="accListingsBox"><div class="empty-acc"><i class="fa fa-box-open"></i>Загрузка...</div></div>
+          </div>
+        </div>
+        <!-- ORDERS -->
+        <div class="acc-section" id="acc-orders">
+          <div class="acc-card">
+            <div class="acc-card-title"><i class="fa fa-shopping-bag"></i> История покупок</div>
+            <div id="accOrdersBox"><div class="empty-acc"><i class="fa fa-shopping-cart"></i>Загрузка...</div></div>
+          </div>
+        </div>
+        <!-- SECURITY -->
+        <div class="acc-section" id="acc-security">
+          <div class="acc-card">
+            <div class="acc-card-title"><i class="fa fa-lock"></i> Изменить пароль</div>
+            <div class="form-group"><label>Новый пароль</label><input id="newPass1" type="password" placeholder="Минимум 6 символов"></div>
+            <div class="form-group"><label>Повторить пароль</label><input id="newPass2" type="password" placeholder="Повторите пароль"></div>
+            <div class="ok-msg" id="passOk">Пароль успешно изменён</div>
+            <div class="err-msg" id="passErr"></div>
+            <button class="save-btn" onclick="changePass()">Изменить пароль</button>
+          </div>
+          <div class="acc-card">
+            <div class="acc-card-title"><i class="fa fa-exclamation-triangle" style="color:var(--gold)"></i> Опасная зона</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px">После выхода потребуется повторный вход.</p>
+            <button class="danger-btn" onclick="doLogout()"><i class="fa fa-sign-out-alt"></i> Выйти из аккаунта</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OFERTA PAGE ===== -->
+<div class="page" id="page-oferta">
+  <div class="legal-wrap">
+    <div class="breadcrumb">
+      <a onclick="nav('home')">Главная</a><i class="fa fa-chevron-right"></i>
+      <span style="color:var(--text)">Договор оферты</span>
+    </div>
+    <div class="legal-card">
+      <div class="legal-hdr">
+        <div class="legal-title">Договор публичной оферты</div>
+        <div class="legal-date">Редакция от 01 января 2024 &nbsp;&middot;&nbsp; ИНН 381207051725</div>
+      </div>
+      <div class="legal-sec"><h2><i class="fa fa-info-circle"></i> 1. Общие положения</h2>
+        <p>Настоящий договор является публичной офертой GameOff (далее &mdash; «Платформа») и определяет условия оказания услуг по предоставлению площадки для совершения сделок купли-продажи цифровых товаров.</p>
+        <p>Регистрируясь на Платформе, вы подтверждаете принятие условий настоящего Договора в полном объёме.</p></div>
+      <div class="legal-sec"><h2><i class="fa fa-users"></i> 2. Стороны договора</h2>
+        <ul><li><strong>Платформа</strong> &mdash; GameOff, маркетплейс цифровых игровых товаров.</li>
+        <li><strong>Пользователь</strong> &mdash; физическое лицо, зарегистрированное на Платформе.</li>
+        <li><strong>Продавец</strong> &mdash; пользователь, размещающий товары для продажи.</li>
+        <li><strong>Покупатель</strong> &mdash; пользователь, приобретающий товары.</li></ul></div>
+      <div class="legal-sec"><h2><i class="fa fa-tag"></i> 3. Предмет договора</h2>
+        <p>Платформа предоставляет функционал для размещения объявлений, поиска и покупки цифровых товаров (скины, аккаунты, валюта, предметы), проведения безопасных транзакций и общения между пользователями.</p></div>
+      <div class="legal-sec"><h2><i class="fa fa-shield-alt"></i> 4. Правила использования</h2>
+        <div class="legal-hl">Запрещается размещение товаров, нарушающих авторские права, лицензионные соглашения игр или законодательство РФ.</div>
+        <ul><li>Пользователь несёт ответственность за достоверность данных.</li>
+        <li>Запрещено использовать Платформу для мошеннических действий.</li>
+        <li>Платформа вправе приостановить аккаунт при нарушении правил.</li>
+        <li>Все товары проходят модерацию перед публикацией.</li></ul></div>
+      <div class="legal-sec"><h2><i class="fa fa-money-bill-wave"></i> 5. Оплата и комиссия</h2>
+        <p>Оплата через ЮKassa. Комиссия 5% от суммы сделки. Возврат средств в течение 14 дней при обоснованных претензиях.</p></div>
+      <div class="legal-sec"><h2><i class="fa fa-gavel"></i> 6. Ответственность</h2>
+        <p>Платформа является информационным посредником и не несёт ответственности за качество реализуемых товаров.</p></div>
+      <div class="legal-sec"><h2><i class="fa fa-envelope"></i> 7. Контакты</h2>
+        <p>Email: <a href="/cdn-cgi/l/email-protection#1e797f737b71787830737f707f797b5e79737f7772307d7173" style="color:var(--acc)"><span class="__cf_email__" data-cfemail="4720262a22282121692a262926202207202a262e2b6924282a">[email&#160;protected]</span></a> &nbsp;&middot;&nbsp; ИНН: 381207051725</p></div>
+    </div>
+  </div>
+  <div id="ofertaFooter"></div>
+</div>
+
+<!-- ===== PRIVACY PAGE ===== -->
+<div class="page" id="page-privacy">
+  <div class="legal-wrap">
+    <div class="breadcrumb">
+      <a onclick="nav('home')">Главная</a><i class="fa fa-chevron-right"></i>
+      <span style="color:var(--text)">Политика конфиденциальности</span>
+    </div>
+    <div class="legal-card">
+      <div class="legal-hdr">
+        <div class="legal-title">Политика конфиденциальности</div>
+        <div class="legal-date">Редакция от 01 января 2024 &nbsp;&middot;&nbsp; ИНН 381207051725</div>
+      </div>
+      <div class="legal-sec"><h2><i class="fa fa-shield-alt"></i> 1. Введение</h2>
+        <p>GameOff уважает конфиденциальность пользователей и защищает персональные данные в соответствии с ФЗ N 152-ФЗ «О персональных данных».</p></div>
+      <div class="legal-sec"><h2><i class="fa fa-database"></i> 2. Собираемые данные</h2>
+        <ul><li><strong>Данные аккаунта:</strong> email, никнейм, дата регистрации;</li>
+        <li><strong>Данные транзакций:</strong> история покупок и продаж;</li>
+        <li><strong>Данные общения:</strong> сообщения в чатах;</li>
+        <li><strong>Технические данные:</strong> IP-адрес, браузер, устройство.</li></ul></div>
+      <div class="legal-sec"><h2><i class="fa fa-share-alt"></i> 3. Передача данных</h2>
+        <div class="legal-hl">Мы не продаём персональные данные третьим лицам в коммерческих целях.</div>
+        <p>Данные передаются: платёжному оператору ЮKassa, сервисам Firebase (Google), государственным органам по законному требованию.</p></div>
+      <div class="legal-sec"><h2><i class="fa fa-lock"></i> 4. Защита данных</h2>
+        <p>Данные хранятся на защищённых серверах Google Firebase с шифрованием. Пароли хранятся в зашифрованном виде.</p></div>
+      <div class="legal-sec"><h2><i class="fa fa-user-check"></i> 5. Права пользователей</h2>
+        <ul><li>Получить информацию о хранящихся данных;</li>
+        <li>Изменить или удалить данные в настройках профиля;</li>
+        <li>Запросить полное удаление данных через email поддержки.</li></ul></div>
+      <div class="legal-sec"><h2><i class="fa fa-envelope"></i> 6. Контакты</h2>
+        <p>Email: <a href="/cdn-cgi/l/email-protection#7e191f131b11181850131f101f191b3e19131f1712501d1113" style="color:var(--acc)"><span class="__cf_email__" data-cfemail="1176707c747e77773f7c707f70767451767c70787d3f727e7c">[email&#160;protected]</span></a></p></div>
+    </div>
+  </div>
+  <div id="privacyFooter"></div>
+</div>
+
+<!-- ===== FOOTER TEMPLATE ===== -->
+<template id="footerTpl">
+  <footer>
+    <div class="footer-grid">
+      <div class="fc-col">
+        <h4>Способы оплаты</h4>
+        <div class="pay-badges-ft">
+          <span class="pay-bdg">СБП</span>
+          <span class="pay-bdg" style="color:#1565c0">МИР</span>
+          <span class="pay-bdg" style="color:#b5591c">ЮMoney</span>
+          <span class="pay-bdg">QIWI</span>
+          <span class="pay-bdg">Крипто</span>
+        </div>
+        <div style="margin-top:18px">
+          <div class="footer-logo"><em>Game</em>Off</div>
+          <p style="margin-top:5px">ИНН 381207051725</p>
+        </div>
+      </div>
+      <div class="fc-col">
+        <h4>Информация</h4>
+        <a onclick="nav('oferta')">Договор оферты</a>
+        <a onclick="nav('privacy')">Политика конфиденциальности</a>
+        <a onclick="nav('catalog')">Каталог товаров</a>
+      </div>
+      <div class="fc-col">
+        <h4>Поддержка</h4>
+        <a href="/cdn-cgi/l/email-protection#64030509010b02024a09050a050301240309050d084a070b09"><span class="__cf_email__" data-cfemail="fa9d9b979f959c9cd4979b949b9d9fba9d979b9396d4999597">[email&#160;protected]</span></a>
+        <a onclick="nav('chats')">Написать продавцу</a>
+      </div>
+      <div class="fc-col">
+        <h4>Наши каналы</h4>
+        <div class="soc-row-ft">
+          <a href="#" class="soc-ico" title="Telegram"><i class="fab fa-telegram"></i></a>
+          <a href="#" class="soc-ico" title="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="soc-ico" title="TikTok"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <span>&#169; 2024 GameOff &#8212; Маркетплейс игровых товаров</span>
+      <div class="footer-logo"><em>Game</em>Off</div>
+    </div>
+  </footer>
+</template>
+
+<!-- ===== AUTH MODAL ===== -->
+<div class="overlay" id="authMd">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('authMd')"><i class="fa fa-times"></i></button>
+    <div class="modal-logo"><em>Game</em>Off</div>
+    <div class="modal-sub">Войди чтобы покупать и продавать</div>
+    <div class="modal-tabs">
+      <button class="modal-tab on" onclick="authTab('in')">Войти</button>
+      <button class="modal-tab" onclick="authTab('up')">Регистрация</button>
+    </div>
+    <div id="formIn">
+      <div class="fg"><label>Email</label><input id="liEmail" type="email" placeholder="player@mail.ru"></div>
+      <div class="fg"><label>Пароль</label><input id="liPass" type="password" placeholder="Пароль" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="err-msg" id="liErr"></div>
+      <button class="modal-btn" onclick="doLogin()">Войти</button>
+    </div>
+    <div id="formUp" style="display:none">
+      <div class="fg"><label>Никнейм</label><input id="regName" placeholder="ProGamer2024"></div>
+      <div class="fg"><label>Email</label><input id="regEmail" type="email" placeholder="player@mail.ru"></div>
+      <div class="fg"><label>Пароль</label><input id="regPass" type="password" placeholder="Минимум 6 символов" onkeydown="if(event.key==='Enter')doReg()"></div>
+      <div class="err-msg" id="regErr"></div>
+      <button class="modal-btn" onclick="doReg()">Создать аккаунт</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SELL MODAL ===== -->
+<div class="overlay" id="sellMd">
+  <div class="modal" style="max-width:460px">
+    <button class="modal-close" onclick="closeModal('sellMd')"><i class="fa fa-times"></i></button>
+    <div style="font-size:18px;font-weight:700;margin-bottom:4px">Разместить товар</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:6px"><i class="fa fa-clock" style="color:var(--gold)"></i> Появится после проверки администратором</div>
+    <div class="fg"><label>Название товара</label><input id="sName" placeholder="AK-47 | Vulcan Factory New"></div>
+    <div class="fg"><label>Игра</label>
+      <select id="sGame"><option>Counter-Strike 2</option><option>Dota 2</option><option>Roblox</option><option>Minecraft</option><option>Brawl Stars</option><option>Standoff 2</option><option>PUBG Mobile</option><option>Fortnite</option><option>Valorant</option><option>Clash Royale</option><option>Clash of Clans</option><option>GTA V</option><option>Другая</option></select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg"><label>Тип</label><select id="sType"><option value="skin">Скин</option><option value="acc">Аккаунт</option><option value="cur">Валюта</option><option value="item">Предмет</option></select></div>
+      <div class="fg"><label>Редкость</label><select id="sRare"><option value="">Обычный</option><option value="rare">Редкий</option><option value="epic">Эпический</option><option value="leg">Легендарный</option></select></div>
+    </div>
+    <div class="fg"><label>Цена (руб.)</label><input id="sPrice" type="number" placeholder="990" min="1"></div>
+    <div class="fg"><label>Описание</label><textarea id="sDesc" placeholder="Подробное описание товара..."></textarea></div>
+    <div class="err-msg" id="sellErr"></div>
+    <button class="modal-btn" id="sellSubmitBtn" onclick="submitSell()">Отправить на проверку</button>
+  </div>
+</div>
+
+<!-- ===== PAY MODAL ===== -->
+<div class="overlay" id="payMd">
+  <div class="modal" style="max-width:440px">
+    <button class="modal-close" onclick="closeModal('payMd')"><i class="fa fa-times"></i></button>
+    <div style="font-size:18px;font-weight:700;margin-bottom:16px">Оплата заказа</div>
+    <div class="pay-item" id="payItemEl"></div>
+    <div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px">Способ оплаты</div>
+    <div class="pay-methods">
+      <button class="pm-btn on" onclick="pickMethod(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>СБП</button>
+      <button class="pm-btn" onclick="pickMethod(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Карта</button>
+      <button class="pm-btn" onclick="pickMethod(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>ЮMoney</button>
+      <button class="pm-btn" onclick="pickMethod(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>QIWI</button>
+      <button class="pm-btn" onclick="pickMethod(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893L4.645 9.144m7.018 1.927.352-1.97"/></svg>Крипто</button>
+      <button class="pm-btn" onclick="pickMethod(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Баланс</button>
+    </div>
+    <div class="pay-total">
+      <span class="pay-total-lbl">Итого к оплате</span>
+      <span class="pay-total-val" id="payTotalVal">0 руб.</span>
+    </div>
+    <div class="pay-wait" id="payWait">
+      <div class="pay-spinner"></div>
+      <div style="font-size:13px;color:var(--muted)" id="payWaitText">Ожидание оплаты...</div>
+    </div>
+    <button class="modal-btn" id="payBtn" onclick="startPayment()">Перейти к оплате</button>
+    <div id="yk-widget-container" style="display:none;margin-top:14px"></div>
+    <div class="pay-note"><i class="fa fa-lock" style="margin-right:4px"></i>Безопасная оплата через ЮKassa</div>
+  </div>
+</div>
+
+<!-- ===== NEW CHAT MODAL ===== -->
+<div class="overlay" id="newChatMd">
+  <div class="modal" style="max-width:400px">
+    <button class="modal-close" onclick="closeModal('newChatMd')"><i class="fa fa-times"></i></button>
+    <div style="font-size:18px;font-weight:700;margin-bottom:4px">Новый чат</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:18px">Введи никнейм пользователя</div>
+    <div class="fg">
+      <label>Никнейм</label>
+      <input id="newChatLogin" placeholder="например: ivan123" oninput="searchChatUser(this.value)">
+    </div>
+    <div id="newChatResults" style="margin-bottom:14px"></div>
+    <div class="err-msg" id="newChatErr"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore-compat.js"></script>
+<script>
+// ===== FIREBASE =====
+const FC={
+  apiKey:"AIzaSyCMnA_3RtG39EfV8kSTrNfjNQMX7UC9F6g",
+  authDomain:"gameoff-93b99.firebaseapp.com",
+  projectId:"gameoff-93b99",
+  storageBucket:"gameoff-93b99.firebasestorage.app",
+  messagingSenderId:"964390110488",
+  appId:"1:964390110488:web:a504ba242cf8bdd0d84a6d"
+};
+firebase.initializeApp(FC);
+const auth=firebase.auth();
+const db=firebase.firestore();
+db.settings({experimentalForceLongPolling:true,merge:true});
+
+// Алиасы чтобы не менять весь код
+const getAuth=()=>auth;
+const collection=(db,col)=>db.collection(col);
+const addDoc=(ref,data)=>ref.add(data);
+const setDoc=(ref,data)=>ref.set(data);
+const getDoc=(ref)=>ref.get();
+const updateDoc=(ref,data)=>ref.update(data);
+const deleteDoc=(ref)=>ref.delete();
+const doc=(db,col,id)=>id?db.collection(col).doc(id):db.collection(col).doc();
+const serverTimestamp=()=>firebase.firestore.FieldValue.serverTimestamp();
+const onSnapshot=(q,cb,err)=>q.onSnapshot(cb,err);
+const query=(ref,...constraints)=>{
+  let q=ref;
+  for(const c of constraints) q=c(q);
+  return q;
+};
+const where=(f,op,v)=>q=>q.where(f,op,v);
+const orderBy=(f,dir)=>q=>q.orderBy(f,dir||'asc');
+const getDocs=(q)=>q.get();
+const getCountFromServer=async(ref)=>{
+  const snap=await ref.get();
+  return{data:()=>({count:snap.size})};
+};
+const onAuthStateChanged=(auth,cb)=>auth.onAuthStateChanged(cb);
+const signOut=(auth)=>auth.signOut();
+const createUserWithEmailAndPassword=(auth,e,p)=>auth.createUserWithEmailAndPassword(e,p);
+const signInWithEmailAndPassword=(auth,e,p)=>auth.signInWithEmailAndPassword(e,p);
+const updateProfile=(user,data)=>user.updateProfile(data);
+const updatePassword=(user,pass)=>user.updatePassword(pass);
+
+// ===== STATE =====
+
+// ===== ДИАГНОСТИКА FIRESTORE =====
+async function diagFirestore(u){
+  const banner=document.createElement('div');
+  banner.id='fs-diag';
+  banner.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:9999;padding:12px 20px;border-radius:10px;font-size:12px;font-weight:600;font-family:Inter,sans-serif;max-width:500px;text-align:left;line-height:1.6;box-shadow:0 8px 24px rgba(0,0,0,.5)';
+  document.body.appendChild(banner);
+
+  function show(lines,ok){
+    banner.style.background=ok?'#0d1f0d':'#1f0d0d';
+    banner.style.border='1px solid '+(ok?'#2a5c2a':'#5c2a2a');
+    banner.style.color=ok?'#4caf50':'#ff8a8a';
+    banner.innerHTML=lines.join('<br>');
+    if(ok)setTimeout(()=>banner.remove(),4000);
+  }
+
+  show(['⏳ Проверяем Firestore...'],true);
+
+  try{
+    const ref=await Promise.race([
+      db.collection('_test').add({ts:serverTimestamp(),uid:u.uid}),
+      new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),6000))
+    ]);
+    await db.collection('_test').doc(ref.id).delete();
+    show(['✅ Firestore работает! Можно размещать товары.'],true);
+  }catch(e){
+    const lines=[
+      '❌ Firestore недоступен',
+      '─────────────────────',
+      'Код: '+(e.code||e.message),
+      'Проект: gameoff-93b99',
+      'Пользователь: '+u.email,
+      '─────────────────────',
+    ];
+    if(e.message==='timeout')
+      lines.push('⚠️ Запрос завис — база не создана или Rules блокируют.');
+    else if(e.code==='permission-denied')
+      lines.push('⚠️ Rules блокируют. Вставь упрощённые rules и нажми Publish.');
+    else if(e.code==='not-found')
+      lines.push('⚠️ База не найдена. Создай Firestore в консоли Firebase.');
+    else if(e.code==='unavailable')
+      lines.push('⚠️ Нет соединения с Firebase.');
+    else
+      lines.push('Полная ошибка: '+JSON.stringify(e));
+    show(lines,false);
+  }
+}
+onAuthStateChanged(auth,u=>{if(u)setTimeout(()=>diagFirestore(u),1500);});
+
+// ===== GAME DATA =====
+const GAMES=[
+  {n:'Brawl Stars',   i:'https://play-lh.googleusercontent.com/GRl9lOQA2EzCuM3JVZt0t3l4Aeod1uFv_Ld6hRXY3bVAQJbdvhtQJlk7iJ5EM9V3g=s96'},
+  {n:'Standoff 2',    i:'https://play-lh.googleusercontent.com/L5JXQZ6qr9YvS1yFfP0GMi_smhNDvYO0yv8EKdJhaxAeXhDZLuCVPKCHxWf6fHiHlg=s96'},
+  {n:'Roblox',        i:'https://play-lh.googleusercontent.com/WRRRb-aFMzQolLdF5rUEeF3ZNq5ZiJflEb6aCrCVHIY6JkMF6KkpPUlXxKjJHuqeEFQ=s96'},
+  {n:'Shadow Fight 2',i:'https://play-lh.googleusercontent.com/Z5RRKDE4oOHB-AvNvJy9v2JtPv3_rOPO4Bi2t5A9q8oeMpUBJsqTMkFa-B3eK0gkGQ=s96'},
+  {n:'Minecraft',     i:'https://play-lh.googleusercontent.com/VSwHQjcAttxsLE4e2XWWYbMZFjAqKYxp1EK1K4XCKaYByDGFxYJsAi5dBleBDz_yMg=s96'},
+  {n:'Clash Royale',  i:'https://play-lh.googleusercontent.com/O1GVAG5MQPJ-kJ37Rvp0drDGRUbJXRMxWFUcV3HrqKGdyWFMRa1Yjsb1Lk-7VbbfEI=s96'},
+  {n:'Clash of Clans',i:'https://play-lh.googleusercontent.com/14UsHPFq9X3GETMnCc7AiYLEzHFHqBnl1bIg0Sxh5B7Xwg0xB1E3yR7LOHcBPB0HA=s96'},
+  {n:'Dota 2',        i:'https://cdn.akamai.steamstatic.com/steam/apps/570/header.jpg'},
+  {n:'Counter-Strike 2',i:'https://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg'},
+  {n:'PUBG Mobile',   i:'https://play-lh.googleusercontent.com/lVVFxrNlrWbHx0ORuA6PGw-YS_3rnSLF2FLT0ggqpAGivyTq_kv9WkM3lHNK5fZBlw=s96'},
+  {n:'Valorant',      i:'https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/Valorant_cover.jpg/200px-Valorant_cover.jpg'},
+  {n:'GTA V',         i:'https://upload.wikimedia.org/wikipedia/en/a/a5/GTA_V.png'},
+  {n:'Fortnite',      i:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Fortnite_word_mark.svg/200px-Fortnite_word_mark.svg.png'},
+  {n:'Apex Legends',  i:'https://upload.wikimedia.org/wikipedia/en/thumb/3/37/Apex_legends_cover.jpg/200px-Apex_legends_cover.jpg'},
+];
+const PLATFORMS=[
+  {n:'Steam',     i:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/64px-Steam_icon_logo.svg.png'},
+  {n:'Epic Games',i:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/64px-Epic_Games_logo.svg.png'},
+  {n:'GOG',       i:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/GOG.com_logo.svg/64px-GOG.com_logo.svg.png'},
+  {n:'Ubisoft',   i:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Ubisoft_logo.svg/64px-Ubisoft_logo.svg.png'},
+];
+const RL={rare:'Редкий',epic:'Эпический',leg:'Легендарный'};
+const TL={skin:'Скин',acc:'Аккаунт',cur:'Валюта',item:'Предмет'};
+
+// ===== STATE =====
+let me=null, allItems=[], homeType='all', homeSortMode='pop';
+let catGameF=null, catTypeF=null, catPrMin=0, catPrMax=Infinity, catSortMode='pop';
+let activeConvId=null, msgUnsub=null, convsUnsub=null, allConvs=[];
+let payItem=null, currentPage='home';
+
+// ===== UTILS =====
+function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function ts2str(ts){
+  if(!ts)return'';
+  try{const d=ts.toDate?ts.toDate():new Date(ts),now=new Date(),diff=now-d;
+  if(diff<86400000)return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+  if(diff<604800000)return['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()];
+  return d.toLocaleDateString('ru',{day:'2-digit',month:'2-digit'});}catch{return'';}
+}
+function ts2date(ts){
+  if(!ts)return'';
+  try{const d=ts.toDate?ts.toDate():new Date(ts),now=new Date();
+  if(d.toDateString()===now.toDateString())return'Сегодня';
+  const y=new Date(now);y.setDate(y.getDate()-1);
+  if(d.toDateString()===y.toDateString())return'Вчера';
+  return d.toLocaleDateString('ru',{day:'numeric',month:'long'});}catch{return'';}
+}
+function gImg(gname){const g=GAMES.find(x=>x.n===gname);return g?`<img src="${g.i}" onerror="this.style.display='none'">`:'<i class="fa fa-gamepad" style="font-size:11px;color:#555"></i>';}
+function gSrc(gname){const g=GAMES.find(x=>x.n===gname);return g?g.i:null;}
+let _tt;
+window.tst=msg=>{const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('on'),3200);};
+window.openModal=id=>document.getElementById(id).classList.add('on');
+window.closeModal=id=>document.getElementById(id).classList.remove('on');
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');}));
+
+// ===== FOOTER INJECT =====
+function injectFooters(){
+  ['homeFooter','catFooter','ofertaFooter','privacyFooter'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.innerHTML=document.getElementById('footerTpl').innerHTML;}
+  });
+}
+injectFooters();
+
+// ===== NAV =====
+window.nav=function(page){
+  currentPage=page;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('page-'+page)?.classList.add('on');
+  document.querySelectorAll('.tb-nav a').forEach(a=>a.classList.remove('on'));
+  const navMap={home:'nav-home',catalog:'nav-catalog',chats:'nav-chats'};
+  if(navMap[page])document.getElementById(navMap[page])?.classList.add('on');
+  window.scrollTo({top:0,behavior:'instant'});
+  if(page==='catalog'){renderCatCards();}
+  if(page==='chats'){
+    document.getElementById('page-chats').style.overflow='hidden';
+    if(me&&!convsUnsub)loadConvs();
+  }
+  if(page==='account')renderAccount();
+};
+
+// ===== AUTH =====
+onAuthStateChanged(auth,user=>{
+  me=user; window._user=user; window._me=user;
+  document.getElementById('loginBtn').style.display=user?'none':'';
+  const chip=document.getElementById('uChip');
+  chip.style.display=user?'flex':'none';
+  if(user){
+    const n=user.displayName||user.email.split('@')[0];
+    document.getElementById('uName').textContent=n;
+    document.getElementById('uAva').textContent=n[0].toUpperCase();
+  }
+  if(user&&currentPage==='account')renderAccount();
+  if(user&&currentPage==='chats')loadConvs();
+});
+
+window.authTab=t=>{
+  document.getElementById('formIn').style.display=t==='in'?'':'none';
+  document.getElementById('formUp').style.display=t==='up'?'':'none';
+  document.querySelectorAll('.modal-tab').forEach((b,i)=>b.classList.toggle('on',(t==='in'&&i===0)||(t==='up'&&i===1)));
+};
+window.doLogin=async()=>{
+  const e=document.getElementById('liEmail').value,p=document.getElementById('liPass').value,err=document.getElementById('liErr');
+  err.classList.remove('on');
+  try{await signInWithEmailAndPassword(auth,e,p);closeModal('authMd');tst('Вход выполнен');}
+  catch(ex){err.textContent=eRu(ex.code);err.classList.add('on');}
+};
+window.doReg=async()=>{
+  const n=document.getElementById('regName').value,e=document.getElementById('regEmail').value,p=document.getElementById('regPass').value,err=document.getElementById('regErr');
+  err.classList.remove('on');
+  if(!n){err.textContent='Введи никнейм';err.classList.add('on');return;}
+  try{
+    const c=await createUserWithEmailAndPassword(auth,e,p);
+    await updateProfile(c.user,{displayName:n});
+    await db.collection('users').doc(c.user.uid).set({uid:c.user.uid,name:n,email:e,role:'user',createdAt:serverTimestamp(),banned:false});
+    closeModal('authMd');tst('Добро пожаловать, '+n+'!');
+  }catch(ex){err.textContent=eRu(ex.code);err.classList.add('on');}
+};
+window.doLogout=async()=>{await signOut(auth);nav('home');tst('Вы вышли из аккаунта');};
+function eRu(c){return({'auth/user-not-found':'Пользователь не найден','auth/wrong-password':'Неверный пароль','auth/email-already-in-use':'Email уже занят','auth/weak-password':'Пароль слишком короткий','auth/invalid-email':'Неверный email','auth/invalid-credential':'Неверный email или пароль'})[c]||c;}
+
+// ===== ОБЪЯВЛЕНИЕ АДМИНИСТРАТОРА (реальное время) =====
+db.collection('config').doc('announce').onSnapshot(snap=>{
+  const banner=document.getElementById('adminBanner');
+  const txt=document.getElementById('adminBannerText');
+  if(!banner||!txt)return;
+  if(snap.exists&&snap.data()?.active&&snap.data()?.text){
+    txt.textContent=snap.data().text;
+    banner.style.display='block';
+  } else {
+    banner.style.display='none';
+  }
+});
+
+// ===== LISTINGS LIVE =====
+db.collection('listings').where('status','==','approved').onSnapshot(snap=>{
+  allItems=snap.docs.map(d=>({id:d.id,...d.data()}));
+  document.getElementById('heroListings').textContent=allItems.length;
+  renderHomeCards();
+  // Каталог рендерим только если он открыт — иначе лишний DOM
+  if(currentPage==='catalog')renderCatCards();
+});
+// Счётчик пользователей — один раз, тихо
+getCountFromServer(db.collection('users'))
+  .then(s=>{const el=document.getElementById('heroUsers');if(el)el.textContent=s.data().count;})
+  .catch(()=>{});
+
+// ===== SEARCH =====
+document.getElementById('searchInp').addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase(),dd=document.getElementById('searchDrop');
+  if(q.length<2){dd.classList.remove('on');return;}
+  const res=allItems.filter(x=>(x.n||'').toLowerCase().includes(q)||(x.g||'').toLowerCase().includes(q));
+  if(!res.length){dd.classList.remove('on');return;}
+  dd.innerHTML=res.slice(0,7).map(r=>{
+    const gs=gSrc(r.g);
+    return`<div class="sd-item" onclick="openPay('${r.id}')">
+      <div class="sd-ico">${gs?`<img src="${gs}" onerror="this.style.display='none'">`:'<i class="fa fa-gamepad" style="color:#555"></i>'}</div>
+      <div><div class="sd-name">${esc(r.n)}</div><div class="sd-game">${esc(r.g)}</div></div>
+      <div class="sd-price">${(r.p||0).toLocaleString('ru')} руб.</div>
+    </div>`;
+  }).join('');
+  dd.classList.add('on');
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))document.getElementById('searchDrop').classList.remove('on');});
+
+// ===== BUILD CARD HTML =====
+function buildCard(it){
+  const gs=gSrc(it.g);
+  const isOwn=it.sellerId&&window._me&&it.sellerId===window._me.uid;
+  return`<div class="lcard">
+    <div class="lcard-thumb">
+      ${it.img?`<img class="lcard-bg" src="${it.img}" alt="" onerror="this.style.display='none'">`:gs?`<img class="lcard-bg" src="${gs}" alt="" onerror="this.style.display='none'">` :''}
+      <div class="lcard-thumb-ico"><i class="fa fa-tag"></i></div>
+      <div class="lcard-gtag">${gImg(it.g)} ${esc(it.g)}</div>
+      <button class="lcard-fav" onclick="event.stopPropagation();favToggle(this)"><i class="far fa-heart"></i></button>
+    </div>
+    <div class="lcard-body">
+      <div class="lcard-title">${esc(it.n)}</div>
+      <div class="lcard-tags">
+        <span class="ltag ${it.r||''}">${RL[it.r]||'Обычный'}</span>
+        <span class="ltag">${TL[it.t]||it.t}</span>
+      </div>
+      <div class="lcard-row">
+        <div class="lcard-price">${(it.p||0).toLocaleString('ru')} руб.<small>&#126;${((it.p||0)/90).toFixed(0)} USD</small></div>
+        <div class="lcard-seller"><div class="seller-av">${(it.s||'?')[0]}</div>${esc(it.s||'—')}</div>
+      </div>
+      ${isOwn
+        ? `<button class="lcard-buy" style="background:#333;cursor:default">Ваш товар</button>`
+        : `<button class="lcard-buy" onclick="buyViaChat('${it.id}')"><i class="fa fa-comment" style="margin-right:6px"></i>Купить — написать продавцу</button>`
+      }
+    </div>
+  </div>`;
+}
+function sortItems(list,mode){
+  if(mode==='asc')return[...list].sort((a,b)=>a.p-b.p);
+  if(mode==='desc')return[...list].sort((a,b)=>b.p-a.p);
+  if(mode==='new')return[...list].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  return list;
+}
+
+// ===== HOME =====
+window.homeFilter=function(btn,v){homeType=v;document.querySelectorAll('#page-home .fc-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderHomeCards();};
+window.homeSort=function(v){homeSort=v;renderHomeCards();};
+function renderHomeCards(){
+  let list=[...allItems];
+  if(homeType!=='all')list=list.filter(x=>x.t===homeType);
+  list=sortItems(list,homeSortMode);
+  document.getElementById('homeCards').innerHTML=list.slice(0,12).map(buildCard).join('')||'<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:40px;font-size:13px"><i class="fa fa-box-open" style="font-size:32px;display:block;margin-bottom:12px;color:#222"></i>Товаров пока нет</div>';
+}
+
+// games tiles
+document.getElementById('homeGames').innerHTML=GAMES.map((g,i)=>`
+  <div class="g-tile" id="hgt${i}" onclick="filterByGame(${i})">
+    <div class="g-img-wrap"><img src="${g.i}" alt="${g.n}" onerror="this.style.opacity='.2'"></div>
+    <div class="g-name">${g.n}</div>
+  </div>`).join('');
+document.getElementById('homePlatforms').innerHTML=PLATFORMS.map(p=>`
+  <div class="g-tile">
+    <div class="g-img-wrap"><img src="${p.i}" alt="${p.n}" onerror="this.style.opacity='.2'"></div>
+    <div class="g-name">${p.n}</div>
+  </div>`).join('');
+
+let homeGameFilter=null;
+window.filterByGame=function(idx){
+  homeGameFilter=homeGameFilter===GAMES[idx].n?null:GAMES[idx].n;
+  document.querySelectorAll('[id^="hgt"]').forEach(t=>t.classList.remove('on'));
+  if(homeGameFilter){
+    document.getElementById('hgt'+idx)?.classList.add('on');
+    document.getElementById('homeListingsTitle').innerHTML=`<i class="fa fa-gamepad"></i> ${homeGameFilter}`;
+  }else{
+    document.getElementById('homeListingsTitle').innerHTML=`<i class="fa fa-fire"></i> Популярные товары`;
+  }
+  renderHomeCardsFilt();
+};
+function renderHomeCardsFilt(){
+  let list=[...allItems];
+  if(homeGameFilter)list=list.filter(x=>x.g===homeGameFilter);
+  if(homeType!=='all')list=list.filter(x=>x.t===homeType);
+  list=sortItems(list,homeSort||homeType);
+  document.getElementById('homeCards').innerHTML=list.slice(0,12).map(buildCard).join('')||'<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:40px;font-size:13px"><i class="fa fa-search" style="font-size:28px;display:block;margin-bottom:10px;color:#222"></i>Нет товаров по выбранным фильтрам</div>';
+}
+// override renderHomeCards to respect game filter
+const _origRHC=renderHomeCards;
+window.renderHomeCards=function(){homeGameFilter?renderHomeCardsFilt():_origRHC();};
+
+// ===== CATALOG =====
+(function buildCatSidebar(){
+  document.getElementById('catGameFilters').innerHTML=GAMES.map((g,i)=>`
+    <div class="csb-game" id="csb-g${i}" onclick="catFilterGame(${i})">
+      <img src="${g.i}" alt="${g.n}" onerror="this.style.opacity='.2'">
+      <span class="csb-gname">${g.n}</span>
+      <span class="csb-cnt" id="csb-gc${i}">0</span>
+    </div>`).join('');
+  const types=[{v:null,l:'Все типы',i:'fa-list'},{v:'skin',l:'Скины',i:'fa-tshirt'},{v:'acc',l:'Аккаунты',i:'fa-user'},{v:'cur',l:'Валюта',i:'fa-coins'},{v:'item',l:'Предметы',i:'fa-cube'}];
+  document.getElementById('catTypeFilters').innerHTML=types.map((t,i)=>`
+    <button class="csb-type-btn${i===0?' on':''}" id="ctt${i}" onclick="catFilterType(${i},${JSON.stringify(t.v)})"><i class="fa ${t.i}"></i> ${t.l}</button>`).join('');
+})();
+
+window.catFilterGame=function(i){
+  catGameF=catGameF===GAMES[i].n?null:GAMES[i].n;
+  document.querySelectorAll('[id^="csb-g"]').forEach(x=>x.classList.remove('on'));
+  if(catGameF)document.getElementById('csb-g'+i)?.classList.add('on');
+  renderCatCards();
+};
+window.catFilterType=function(i,v){
+  catTypeF=v;
+  document.querySelectorAll('.csb-type-btn').forEach(x=>x.classList.remove('on'));
+  document.getElementById('ctt'+i)?.classList.add('on');
+  renderCatCards();
+};
+window.applyPrice=()=>{catPrMin=Number(document.getElementById('prMin').value)||0;catPrMax=Number(document.getElementById('prMax').value)||Infinity;renderCatCards();};
+window.catSort=v=>{catSortMode=v;renderCatCards();};
+
+function renderCatCards(){
+  let list=[...allItems];
+  if(catGameF)list=list.filter(x=>x.g===catGameF);
+  if(catTypeF)list=list.filter(x=>x.t===catTypeF);
+  list=list.filter(x=>x.p>=catPrMin&&x.p<=catPrMax);
+  list=sortItems(list,catSortMode);
+  // update counts
+  GAMES.forEach((g,i)=>{
+    const cnt=allItems.filter(x=>x.g===g.n).length;
+    const el=document.getElementById('csb-gc'+i);if(el)el.textContent=cnt;
+  });
+  document.getElementById('catCount').textContent=list.length+' товаров';
+  document.getElementById('catEmpty').style.display=list.length?'none':'block';
+  document.getElementById('catCards').innerHTML=list.map(buildCard).join('');
+}
+
+// ===== SELL =====
+window.openSell=()=>{
+  // Перепроверяем auth напрямую через Firebase
+  const u=auth.currentUser;
+  if(!u){openModal('authMd');tst('Войди чтобы продавать');return;}
+  me=u; // обновляем на случай если state ещё не пришёл
+  openModal('sellMd');
+  // Сброс формы и ошибок при открытии
+  document.getElementById('sellErr').classList.remove('on');
+  const btn=document.getElementById('sellSubmitBtn');
+  btn.disabled=false;btn.textContent='Отправить на проверку';
+};
+
+window.submitSell=async()=>{
+  const u=auth.currentUser;
+  if(!u){closeModal('sellMd');openModal('authMd');return;}
+
+  const n=document.getElementById('sName').value.trim();
+  const p=Number(document.getElementById('sPrice').value);
+  const errEl=document.getElementById('sellErr');
+  errEl.classList.remove('on');
+
+  if(!n){errEl.textContent='Введи название товара';errEl.classList.add('on');return;}
+  if(!p||p<1){errEl.textContent='Введи корректную цену (минимум 1 руб.)';errEl.classList.add('on');return;}
+
+  const btn=document.getElementById('sellSubmitBtn');
+  btn.disabled=true;
+  btn.innerHTML='<i class="fa fa-spinner fa-spin" style="margin-right:6px"></i>Отправляем...';
+
+  try{
+    await db.collection('listings').add({
+      n,
+      g:document.getElementById('sGame').value,
+      t:document.getElementById('sType').value,
+      r:document.getElementById('sRare').value,
+      p,
+      desc:document.getElementById('sDesc').value.trim(),
+      s:u.displayName||u.email.split('@')[0],
+      sellerId:u.uid,
+      createdAt:serverTimestamp(),
+      status:'pending'
+    });
+    btn.disabled=false;
+    btn.textContent='Отправить на проверку';
+    closeModal('sellMd');
+    tst('✓ Товар отправлен на проверку. После одобрения появится в каталоге.');
+    ['sName','sPrice','sDesc'].forEach(id=>document.getElementById(id).value='');
+  }catch(err){
+    btn.disabled=false;
+    btn.textContent='Отправить на проверку';
+    // Показываем точную ошибку Firebase
+    const codes={'permission-denied':'Нет прав записи — обнови Firestore Rules','not-found':'База не найдена — создай Firestore в консоли','unavailable':'Нет соединения с Firebase','unauthenticated':'Не авторизован — войди в аккаунт'};
+    errEl.textContent='Ошибка ['+err.code+']: '+(codes[err.code]||err.message);
+    errEl.classList.add('on');
+    console.error('submitSell:',err.code, err.message);
+  }
+};
+
+// ===== PAY =====
+// ─── НАСТРОЙКА ОПЛАТЫ ───────────────────────────────────────────
+// Шаг 1: задеплой Firebase Function из папки functions/
+//   cd functions && npm install
+//   firebase deploy --only functions
+// Шаг 2: вставь URL сюда (вида https://us-central1-gameoff-9c1ab.cloudfunctions.net/createPayment)
+const PAYMENT_FUNCTION_URL = '';  // ← URL после деплоя
+// Пока пустой — работает демо-режим (заказ создаётся, списания нет)
+// ────────────────────────────────────────────────────────────────
+
+// Загрузка SDK ЮKassa один раз при необходимости
+let ykSDKLoaded = false;
+function loadYKSDK(){
+  return new Promise((resolve,reject)=>{
+    if(ykSDKLoaded){resolve();return;}
+    const s=document.createElement('script');
+    s.src='https://yookassa.ru/checkout-widget/v1/checkout-widget.js';
+    s.onload=()=>{ykSDKLoaded=true;resolve();};
+    s.onerror=()=>reject(new Error('Не удалось загрузить виджет ЮKassa'));
+    document.head.appendChild(s);
+  });
+}
+
+window.openPay=function(id){
+  if(!me){openModal('authMd');tst('Войди чтобы купить');return;}
+  const it=allItems.find(x=>x.id===id);if(!it)return;
+  payItem=it;
+  const gs=gSrc(it.g);
+  document.getElementById('payItemEl').innerHTML=`
+    <div class="pay-item-ico">${gs?`<img src="${gs}" onerror="this.style.display='none'">`:'<i class="fa fa-tag" style="color:#555"></i>'}</div>
+    <div><div class="pay-item-name">${esc(it.n)}</div><div class="pay-item-game">${esc(it.g)} &middot; ${esc(it.s)}</div></div>
+    <div class="pay-item-price">${(it.p||0).toLocaleString('ru')} руб.</div>`;
+  document.getElementById('payTotalVal').textContent=(it.p||0).toLocaleString('ru')+' руб.';
+  // сброс состояния
+  document.getElementById('payWait').classList.remove('on');
+  document.getElementById('payBtn').style.display='';
+  document.getElementById('yk-widget-container').innerHTML='';
+  document.getElementById('yk-widget-container').style.display='none';
+  openModal('payMd');
+};
+
+window.pickMethod=btn=>{
+  document.querySelectorAll('.pm-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+};
+
+window.startPayment=async()=>{
+  if(!payItem||!me)return;
+
+  // Нет URL функции → демо-режим
+  if(!PAYMENT_FUNCTION_URL){
+    // ── ДЕМО-режим: показываем реалистичный виджет без реального списания ──
+    const orderRef=await db.collection('orders').add({
+      itemId:payItem.id,itemName:payItem.n,amount:payItem.p,
+      buyerId:me.uid,buyerEmail:me.email,sellerId:payItem.sellerId||null,
+      status:'pending',createdAt:serverTimestamp()
+    });
+    document.getElementById('payBtn').style.display='none';
+    document.getElementById('payWait').classList.add('on');
+    document.getElementById('payWaitText').innerHTML=`
+      <div style="background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:9px;padding:12px 14px;text-align:left;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:#f5a623;margin-bottom:5px"><i class="fa fa-exclamation-triangle" style="margin-right:5px"></i>Демо-режим</div>
+        <div style="font-size:11px;color:#888;line-height:1.6">Задеплой <code style="background:#1a1a1a;padding:1px 5px;border-radius:4px;color:#4fc3f7">functions/index.js</code> и вставь URL в переменную <code style="background:#1a1a1a;padding:1px 5px;border-radius:4px;color:#4fc3f7">PAYMENT_FUNCTION_URL</code></div>
+      </div>
+      <div id="demoCard" style="background:#1a1a1a;border:1px solid #252525;border-radius:10px;padding:16px">
+        <div style="font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Номер карты</div>
+        <input readonly value="4111 1111 1111 1111" style="width:100%;background:#111;border:1px solid #1e1e1e;border-radius:7px;padding:9px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:14px;letter-spacing:1px;outline:none;margin-bottom:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Срок</div>
+            <input readonly value="12/28" style="width:100%;background:#111;border:1px solid #1e1e1e;border-radius:7px;padding:9px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:14px;outline:none">
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">CVV</div>
+            <input readonly value="000" style="width:100%;background:#111;border:1px solid #1e1e1e;border-radius:7px;padding:9px 12px;color:#e0e0e0;font-family:'Inter',sans-serif;font-size:14px;outline:none">
+          </div>
+        </div>
+        <button onclick="confirmDemoPay('${orderRef.id}')" style="width:100%;padding:11px;border-radius:9px;background:var(--acc);border:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--acc2)'" onmouseout="this.style.background='var(--acc)'">
+          Оплатить ${(payItem.p||0).toLocaleString('ru')} руб.
+        </button>
+      </div>`;
+    document.getElementById('payWait').style.display='block';
+    return;
+  }
+
+  // ── РЕАЛЬНЫЙ режим: Cloud Function → ЮKassa виджет ──
+  const orderRef=await db.collection('orders').add({
+    itemId:payItem.id,itemName:payItem.n,amount:payItem.p,
+    buyerId:me.uid,buyerEmail:me.email,sellerId:payItem.sellerId||null,
+    status:'pending',createdAt:serverTimestamp()
+  });
+
+  document.getElementById('payBtn').style.display='none';
+  document.getElementById('payWait').classList.add('on');
+  document.getElementById('payWaitText').textContent='Создаём платёж...';
+
+  try{
+    // Получаем ID токен пользователя для авторизации на бэкенде
+    const idToken = await me.getIdToken();
+
+    // Вызываем нашу Firebase Function
+    const resp = await fetch(PAYMENT_FUNCTION_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({
+        orderId:   orderRef.id,
+        amount:    payItem.p,
+        description:`GameOff: ${payItem.n}`,
+        returnUrl: location.href
+      })
+    });
+
+    if(!resp.ok){
+      const err=await resp.json().catch(()=>({}));
+      throw new Error(err.error||'Ошибка сервера '+resp.status);
+    }
+
+    const {confirmationToken} = await resp.json();
+
+    // Загружаем SDK и показываем виджет
+    document.getElementById('payWaitText').textContent='Загружаем форму оплаты...';
+    await loadYKSDK();
+    document.getElementById('payWait').classList.remove('on');
+    document.getElementById('yk-widget-container').style.display='block';
+
+    const checkout=new window.YooMoneyCheckoutWidget({
+      confirmation_token: confirmationToken,
+      return_url: location.href,
+      customization:{
+        colors:{
+          control_primary:'#e81c5a',
+          background:{enabled:true,color:'#141414'}
+        }
+      },
+      error_callback(err){
+        console.error('ЮKassa:',err);
+        tst('Ошибка: '+(err.error||'что-то пошло не так'));
+        document.getElementById('yk-widget-container').innerHTML='';
+        document.getElementById('yk-widget-container').style.display='none';
+        document.getElementById('payBtn').style.display='';
+      }
+    });
+
+    checkout.on('success',async()=>{
+      checkout.destroy();
+      document.getElementById('yk-widget-container').innerHTML='';
+      document.getElementById('yk-widget-container').style.display='none';
+      // Статус придёт через webhook автоматически, но для UX обновим сразу
+      await orderRef.update({status:'paid',paidAt:serverTimestamp()});
+      closeModal('payMd');
+      tst('Оплата '+payItem.p.toLocaleString('ru')+' руб. прошла!');
+      payItem=null;
+    });
+
+    checkout.render('yk-widget-container');
+
+  }catch(err){
+    console.error(err);
+    document.getElementById('payWait').classList.remove('on');
+    document.getElementById('payBtn').style.display='';
+    tst('Ошибка оплаты: '+err.message);
+  }
+};
+
+// Подтверждение в демо-режиме
+window.confirmDemoPay=async(orderId)=>{
+  const btn=document.querySelector('#demoCard button');
+  if(btn){btn.disabled=true;btn.textContent='Обрабатываем...';}
+  await new Promise(r=>setTimeout(r,1500));
+  await db.collection('orders').doc(orderId).update({status:'paid',paidAt:serverTimestamp()});
+  document.getElementById('payWait').innerHTML=`
+    <div style="text-align:center;padding:12px 0">
+      <div style="width:56px;height:56px;border-radius:50%;background:rgba(76,175,80,.1);border:2px solid #4caf50;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <i class="fa fa-check" style="font-size:22px;color:#4caf50"></i>
+      </div>
+      <div style="font-size:18px;font-weight:700;color:#4caf50;margin-bottom:6px">Оплачено!</div>
+      <div style="font-size:13px;color:#555">Продавец получил уведомление</div>
+    </div>`;
+  setTimeout(()=>{closeModal('payMd');tst('Оплата '+payItem?.p?.toLocaleString('ru')+' руб. прошла!');payItem=null;},2200);
+};
+
+// ===== FAV =====
+window.favToggle=btn=>{
+  const i=btn.querySelector('i'),f=i.classList.contains('fas');
+  i.className=f?'far fa-heart':'fas fa-heart';
+  btn.style.color=f?'':'var(--acc)';
+  tst(f?'Удалено из избранного':'Добавлено в избранное');
+};
+
+// ===== CHAT =====
+function loadConvs(){
+  if(!me)return;
+  if(convsUnsub)convsUnsub();
+  convsUnsub=db.collection('conversations').where('participants','array-contains',me.uid).onSnapshot(snap=>{
+    allConvs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.lastTime?.seconds||0)-(a.lastTime?.seconds||0));
+    renderConvsList(allConvs);
+  });
+}
+function partnerName(c){
+  if(!me)return'—';
+  const nm=c.participantNames||{};
+  const pair=Object.entries(nm).find(([k])=>k!==me.uid);
+  return pair?pair[1]:'Собеседник';
+}
+function renderConvsList(convs){
+  const el=document.getElementById('convList');
+  if(!me){el.innerHTML='<div class="conv-empty"><i class="fa fa-lock"></i>Войди чтобы<br>видеть чаты</div>';return;}
+  if(!convs.length){el.innerHTML='<div class="conv-empty"><i class="fa fa-comment"></i>Чатов пока нет.<br>Напиши продавцу из каталога.</div>';return;}
+  el.innerHTML=convs.map(c=>`
+    <div class="conv-item${c.id===activeConvId?' on':''}" id="ci-${c.id}" onclick="selectConv('${c.id}')">
+      <div class="conv-ava">${partnerName(c)[0].toUpperCase()}</div>
+      <div class="conv-info">
+        <div class="conv-name">${esc(partnerName(c))}</div>
+        <div class="conv-last">${esc(c.lastMsg||c.itemName||'Новый чат')}</div>
+      </div>
+      <span class="conv-time">${ts2str(c.lastTime)}</span>
+    </div>`).join('');
+}
+window.filterConvs=q=>{q?renderConvsList(allConvs.filter(c=>partnerName(c).toLowerCase().includes(q.toLowerCase()))):renderConvsList(allConvs);};
+window.selectConv=function(id){
+  activeConvId=id;
+  document.querySelectorAll('.conv-item').forEach(x=>x.classList.remove('on'));
+  document.getElementById('ci-'+id)?.classList.add('on');
+  const c=allConvs.find(x=>x.id===id),pn=c?partnerName(c):'Собеседник';
+  buildChatWin(id,pn,c?.itemName||'');
+  listenMsgs(id);
+};
+function buildChatWin(id,pn,item){
+  const w=document.getElementById('chatWin');
+  w.className='chat-win';
+  w.innerHTML=`
+    <div class="cwin-head">
+      <div class="cwin-ava">${pn[0].toUpperCase()}</div>
+      <div><div class="cwin-name">${esc(pn)}</div><div class="cwin-status">В сети</div></div>
+      ${item?`<div class="cwin-item"><i class="fa fa-tag"></i>${esc(item)}</div>`:''}
+    </div>
+    <div class="msgs-area" id="msgsArea"></div>
+    <div class="chat-inp-row">
+      <textarea class="chat-textarea" id="chatInp" placeholder="Написать сообщение..." rows="1"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
+      <button class="chat-send" onclick="sendMsg()"><i class="fa fa-paper-plane"></i></button>
+    </div>`;
+}
+function listenMsgs(id){
+  if(msgUnsub)msgUnsub();
+  msgUnsub=db.collection('conversations').doc(id).collection('messages').orderBy('ts').onSnapshot(snap=>{
+    const box=document.getElementById('msgsArea');if(!box)return;
+    box.innerHTML='';let lastDate='';
+    snap.forEach(d=>{
+      const m=d.data(),isMe=m.senderId===me?.uid;
+      const t=m.ts?.toDate?new Date(m.ts.toDate()).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}):'';
+      const ds=m.ts?ts2date(m.ts):'';
+      if(ds&&ds!==lastDate){lastDate=ds;box.innerHTML+=`<div class="date-sep"><span>${ds}</span></div>`;}
+      box.innerHTML+=`<div class="msg-row${isMe?' me':''}">
+        ${!isMe?`<div class="msg-av">${(m.senderName||'?')[0].toUpperCase()}</div>`:''}
+        <div class="msg-content">
+          ${!isMe?`<div class="msg-sender">${esc(m.senderName||'')}</div>`:''}
+          <div class="msg-bbl">${esc(m.text)}</div>
+          <div class="msg-time">${t}</div>
+        </div>
+      </div>`;
+    });
+    box.scrollTop=box.scrollHeight;
+  });
+}
+window.sendMsg=async()=>{
+  if(!me||!activeConvId)return;
+  const inp=document.getElementById('chatInp');if(!inp)return;
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
+  await db.collection('conversations').doc(activeConvId).collection('messages').add({text,senderId:me.uid,senderName:me.displayName||me.email.split('@')[0],ts:serverTimestamp()});
+  await db.collection('conversations').doc(activeConvId).update({lastMsg:text,lastTime:serverTimestamp()});
+};
+// Открыть или создать чат по uid собеседника
+async function openOrCreateChat(partnerUid, partnerName, itemName){
+  if(!me)return;
+  if(partnerUid===me.uid){tst('Нельзя написать самому себе');return;}
+
+  // ID чата = сортированные uid через __
+  const id=[me.uid,partnerUid].sort().join('__');
+  const myName=me.displayName||me.email.split('@')[0];
+  const r=db.collection('conversations').doc(id);
+  const s=await r.get();
+  if(!s.exists()){
+    await r.set({
+      participants:[me.uid,partnerUid],
+      participantNames:{[me.uid]:myName,[partnerUid]:partnerName},
+      itemName:itemName||'',
+      lastMsg:'',
+      lastTime:serverTimestamp(),
+      createdAt:serverTimestamp()
+    });
+  }
+  if(!convsUnsub)loadConvs();
+  setTimeout(()=>selectConv(id),300);
+}
+
+// Показать модалку нового чата
+window.showNewChatModal=()=>{
+  if(!me){openModal('authMd');return;}
+  document.getElementById('newChatLogin').value='';
+  document.getElementById('newChatResults').innerHTML='';
+  document.getElementById('newChatErr').classList.remove('on');
+  openModal('newChatMd');
+};
+
+// Поиск пользователя по нику
+let searchTimer=null;
+window.searchChatUser=function(q){
+  const res=document.getElementById('newChatResults');
+  const err=document.getElementById('newChatErr');
+  err.classList.remove('on');
+  clearTimeout(searchTimer);
+  q=q.trim();
+  if(q.length<2){res.innerHTML='';return;}
+  res.innerHTML='<div style="font-size:12px;color:var(--muted);padding:6px 0"><i class="fa fa-spinner fa-spin" style="margin-right:5px"></i>Ищем...</div>';
+  searchTimer=setTimeout(async()=>{
+    try{
+      const snap=await db.collection('users').where('name','==',q).get();
+      if(snap.empty){
+        res.innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 0"><i class="fa fa-user-slash" style="margin-right:6px"></i>Пользователь не найден</div>';
+        return;
+      }
+      res.innerHTML=snap.docs.map(d=>{
+        const u=d.data();
+        if(u.uid===me.uid)return'';
+        return`<div onclick="startChatWithUser('${u.uid}','${esc(u.name)}')"
+          style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;background:#1a1a1a;border:1px solid var(--border);transition:border-color .2s"
+          onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0">
+            ${u.name[0].toUpperCase()}
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:600">${esc(u.name)}</div>
+            <div style="font-size:11px;color:var(--muted)">Нажми чтобы написать</div>
+          </div>
+          <i class="fa fa-chevron-right" style="margin-left:auto;color:var(--dim);font-size:12px"></i>
+        </div>`;
+      }).join('');
+    }catch(e){
+      res.innerHTML='';
+      err.textContent='Ошибка поиска: '+e.message;
+      err.classList.add('on');
+    }
+  },400);
+};
+
+window.startChatWithUser=async(uid,name)=>{
+  closeModal('newChatMd');
+  nav('chats');
+  await openOrCreateChat(uid,name,'');
+};
+
+// Открыть чат с продавцом из карточки товара
+window.goChat=async function(sellerUid, sellerName, itemName){
+  if(!me){openModal('authMd');return;}
+  nav('chats');
+  await openOrCreateChat(sellerUid, sellerName, itemName);
+};
+
+// Кнопка "Купить" — открывает чат с продавцом с автосообщением
+window.buyViaChat=async function(itemId){
+  if(!me){openModal('authMd');tst('Войди чтобы купить');return;}
+  const it=allItems.find(x=>x.id===itemId);
+  if(!it){tst('Товар не найден');return;}
+  if(it.sellerId===me.uid){tst('Это ваш товар');return;}
+  nav('chats');
+  await openOrCreateChat(it.sellerId, it.s||'Продавец', it.n);
+  // Автосообщение от покупателя
+  setTimeout(async()=>{
+    if(!activeConvId)return;
+    const convId=[me.uid,it.sellerId].sort().join('__');
+    const text=`Здравствуйте! Хочу купить "${it.n}" за ${(it.p||0).toLocaleString('ru')} руб. Товар ещё доступен?`;
+    await db.collection('conversations').doc(convId).collection('messages').add({
+      text, senderId:me.uid,
+      senderName:me.displayName||me.email.split('@')[0],
+      ts:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('conversations').doc(convId).update({
+      lastMsg:text, lastTime:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  },500);
+};
+
+window.startNewChat=window.showNewChatModal;
+
+// ===== ACCOUNT =====
+// Хранилище отписчиков для аккаунта
+let _listingsUnsub=null, _ordersUnsub=null;
+
+function renderAccount(){
+  const u=me;
+  if(!u){
+    document.getElementById('accLoggedOut').style.display='block';
+    document.getElementById('accContent').style.display='none';
+    return;
+  }
+  document.getElementById('accLoggedOut').style.display='none';
+  document.getElementById('accContent').style.display='grid';
+  const n=u.displayName||u.email.split('@')[0];
+  document.getElementById('accBigAva').textContent=n[0].toUpperCase();
+  document.getElementById('accProfileName').textContent=u.displayName||n;
+  document.getElementById('accProfileEmail').textContent=u.email;
+  document.getElementById('editName').value=u.displayName||n;
+  document.getElementById('editEmail').value=u.email;
+  // Загружаем только если ещё не подписаны
+  if(!_listingsUnsub)loadMyListings(u.uid);
+  if(!_ordersUnsub)loadMyOrders(u.uid);
+}
+window.accTab=function(id,el){
+  document.querySelectorAll('.acc-section').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.acc-nav-item').forEach(s=>s.classList.remove('on'));
+  document.getElementById('acc-'+id).classList.add('on');
+  el.classList.add('on');
+};
+function loadMyListings(uid){
+  if(_listingsUnsub){_listingsUnsub();_listingsUnsub=null;}
+  // Показываем скелетон сразу
+  document.getElementById('accListingsBox').innerHTML='<div class="empty-acc"><i class="fa fa-spinner fa-spin" style="color:#444"></i></div>';
+  _listingsUnsub=db.collection('listings').where('sellerId','==',uid).onSnapshot(
+    snap=>{
+      document.getElementById('accStatListings').textContent=snap.size;
+      const box=document.getElementById('accListingsBox');
+      if(!snap.size){box.innerHTML='<div class="empty-acc"><i class="fa fa-box-open"></i>Нет объявлений</div>';return;}
+      const SC={pending:'st-pending',approved:'st-approved',rejected:'st-rejected'};
+      const SL={pending:'На проверке',approved:'Активно',rejected:'Отклонено'};
+      const sorted=snap.docs.slice().sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+      box.innerHTML=sorted.map(d=>{const it=d.data();return`<div class="listing-item">
+        <div class="li-info"><div class="li-name">${esc(it.n)}</div><div class="li-sub">${esc(it.g)} &middot; ${TL[it.t]||it.t}</div></div>
+        <span class="li-price">${(it.p||0).toLocaleString('ru')} руб.</span>
+        <span class="status-badge ${SC[it.status]||'st-pending'}">${SL[it.status]||'На проверке'}</span>
+      </div>`;}).join('');
+    },
+    err=>{document.getElementById('accListingsBox').innerHTML='<div class="empty-acc"><i class="fa fa-exclamation-triangle" style="color:var(--acc)"></i>Ошибка загрузки</div>';}
+  );
+}
+function loadMyOrders(uid){
+  if(_ordersUnsub){_ordersUnsub();_ordersUnsub=null;}
+  document.getElementById('accOrdersBox').innerHTML='<div class="empty-acc"><i class="fa fa-spinner fa-spin" style="color:#444"></i></div>';
+  _ordersUnsub=db.collection('orders').where('buyerId','==',uid).onSnapshot(
+    snap=>{
+      document.getElementById('accStatOrders').textContent=snap.size;
+      const box=document.getElementById('accOrdersBox');
+      if(!snap.size){box.innerHTML='<div class="empty-acc"><i class="fa fa-shopping-cart"></i>Покупок пока нет</div>';return;}
+      const sorted=snap.docs.slice().sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+      box.innerHTML=sorted.map(d=>{const o=d.data();
+        const dt=o.createdAt?.toDate?o.createdAt.toDate().toLocaleDateString('ru'):'—';
+        return`<div class="listing-item">
+          <div class="li-info"><div class="li-name">${esc(o.itemName||'—')}</div><div class="li-sub">${dt} · ${o.status==='paid'?'Оплачено':'Ожидание'}</div></div>
+          <span class="li-price">${(o.amount||0).toLocaleString('ru')} руб.</span>
+        </div>`;}).join('');
+    },
+    err=>{document.getElementById('accOrdersBox').innerHTML='<div class="empty-acc"><i class="fa fa-exclamation-triangle" style="color:var(--acc)"></i>Ошибка загрузки</div>';}
+  );
+}
+// Отписываемся при выходе
+const _origLogout=window.doLogout;
+window.doLogout=async()=>{
+  if(_listingsUnsub){_listingsUnsub();_listingsUnsub=null;}
+  if(_ordersUnsub){_ordersUnsub();_ordersUnsub=null;}
+  if(convsUnsub){convsUnsub();convsUnsub=null;}
+  await _origLogout();
+};
+window.saveProfile=async()=>{
+  if(!me)return;
+  const n=document.getElementById('editName').value.trim();
+  const ok=document.getElementById('profileOk'),err=document.getElementById('profileErr');
+  ok.classList.remove('on');err.classList.remove('on');
+  if(!n){err.textContent='Введи никнейм';err.classList.add('on');return;}
+  try{
+    await updateProfile(me,{displayName:n});
+    await db.collection('users').doc(me.uid).update({name:n});
+    document.getElementById('accProfileName').textContent=n;
+    document.getElementById('uName').textContent=n;
+    document.getElementById('uAva').textContent=n[0].toUpperCase();
+    document.getElementById('accBigAva').textContent=n[0].toUpperCase();
+    ok.classList.add('on');tst('Данные сохранены');
+  }catch(e){err.textContent='Ошибка: '+e.message;err.classList.add('on');}
+};
+window.changePass=async()=>{
+  if(!me)return;
+  const p=document.getElementById('newPass1').value,p2=document.getElementById('newPass2').value;
+  const ok=document.getElementById('passOk'),err=document.getElementById('passErr');
+  ok.classList.remove('on');err.classList.remove('on');
+  if(p.length<6){err.textContent='Пароль должен быть минимум 6 символов';err.classList.add('on');return;}
+  if(p!==p2){err.textContent='Пароли не совпадают';err.classList.add('on');return;}
+  try{
+    await updatePassword(me,p);
+    ok.classList.add('on');
+    document.getElementById('newPass1').value='';
+    document.getElementById('newPass2').value='';
+    tst('Пароль изменён');
+  }catch(e){
+    err.textContent=e.code==='auth/requires-recent-login'?'Войдите заново чтобы изменить пароль':'Ошибка: '+e.message;
+    err.classList.add('on');
+  }
+};
+
+renderHomeCards();
+
+
+// ===== SEED ТОВАРА ПРОДАВЦА =====
+async function seedSellerItem(){
+  const ITEM_ID='menzi_brawlstars_acc_001';
+  const ref=db.collection('listings').doc(ITEM_ID);
+  const snap=await ref.get();
+  if(snap.exists())return;
+  await ref.set({
+    n:'Аккаунт Brawl Stars — 505 кубков',
+    g:'Brawl Stars',
+    t:'acc',
+    r:'epic',
+    p:1000,
+    desc:'Аккаунт с 505 кубками. 3 бойца открыты. Новый сезон. Продаю так как не играю. Пишите — договоримся об условиях передачи.',
+    s:'menzi',
+    sellerId:'5ClrXMvm3ZaM4zODqHrND7Npq7n2',
+    img:'https://play-lh.googleusercontent.com/GRl9lOQA2EzCuM3JVZt0t3l4Aeod1uFv_Ld6hRXY3bVAQJbdvhtQJlk7iJ5EM9V3g=s96',
+    status:'approved',
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+setTimeout(seedSellerItem,2000);
+</script>
+
+</body>
+</html>
