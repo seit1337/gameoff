@@ -108,9 +108,9 @@ tr:hover td{background:#181818;}
 .cm-ci:hover,.cm-ci.on{background:#1e1e1e;}
 .cm-nm{font-size:12px;font-weight:600;margin-bottom:2px;}
 .cm-lm{font-size:11px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cm-msgs-wrap{display:flex;flex-direction:column;}
+.cm-msgs-wrap{display:flex;flex-direction:column;height:460px;overflow:hidden;}
 .cm-nosel{flex:1;display:flex;align-items:center;justify-content:center;color:#222;font-size:13px;}
-.cm-msgs{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
+.cm-msgs{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;min-height:0;}
 .cm-msgs::-webkit-scrollbar{width:3px;}
 .cm-msgs::-webkit-scrollbar-thumb{background:#1e1e1e;}
 .cm-msg{max-width:78%;}
@@ -123,6 +123,26 @@ tr:hover td{background:#181818;}
 
 .site-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;background:#1a1a1a;border:1px solid #252525;color:#666;font-size:12px;font-weight:600;transition:all .2s;}
 .site-btn:hover{border-color:var(--acc);color:var(--acc);}
+@media(max-width:900px){
+  .admin-layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .main-content{padding:14px;}
+}
+@media(max-width:600px){
+  body{font-size:13px;}
+  .main-content{padding:10px;}
+  .section-card{border-radius:10px;}
+  .sc-head{padding:12px 14px;}
+  .sc-title{font-size:13px;}
+  table{font-size:11px;}
+  table th,table td{padding:8px 8px;}
+  .act{padding:5px 8px;font-size:11px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .stat-card{padding:14px;}
+  .stat-num{font-size:22px;}
+  .topbar-admin{padding:0 14px;}
+  .login-card{padding:24px 18px;margin:20px 14px;}
+}
 </style>
 </head>
 <body>
@@ -133,7 +153,7 @@ tr:hover td{background:#181818;}
     <div class="login-icon"><i class="fa fa-shield-alt"></i></div>
     <div class="login-title"><em>Game</em>Off <span class="sb-admin-badge">ADMIN</span></div>
     <div class="login-sub">Панель управления платформой</div>
-    <input class="l-inp" id="adE" type="email" placeholder="boyzein28@gmail.com" value="boyzein28@gmail.com">
+    <input class="l-inp" id="adE" type="email" placeholder="Ваш email" value="">
     <input class="l-inp" id="adP" type="password" placeholder="Пароль администратора" onkeydown="if(event.key==='Enter')adminLogin()">
     <div class="l-err" id="adErr"></div>
     <button class="l-btn" onclick="adminLogin()"><i class="fa fa-sign-in-alt" style="margin-right:6px"></i>Войти в панель</button>
@@ -281,7 +301,7 @@ tr:hover td{background:#181818;}
         <div class="section-card">
           <div class="sc-head"><div class="sc-title"><i class="fa fa-fire"></i> Firebase проект</div></div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px">
-            <div style="background:#1a1a1a;border-radius:9px;padding:12px"><div style="font-size:10px;color:#333;margin-bottom:3px">PROJECT ID</div><div style="font-size:12px;font-weight:600">gameoff-93b99</div></div>
+            <div style="background:#1a1a1a;border-radius:9px;padding:12px"><div style="font-size:10px;color:#333;margin-bottom:3px">PROJECT ID</div><div style="font-size:12px;font-weight:600">gameoff-9c1ab</div></div>
             <div style="background:#1a1a1a;border-radius:9px;padding:12px"><div style="font-size:10px;color:#333;margin-bottom:3px">AUTH</div><div style="font-size:12px;font-weight:600">Email/Password</div></div>
             <div style="background:#1a1a1a;border-radius:9px;padding:12px"><div style="font-size:10px;color:#333;margin-bottom:3px">СТАТУС</div><div style="font-size:12px;font-weight:600;color:#4caf50" id="fbStatus"><i class="fa fa-circle" style="font-size:8px;margin-right:4px"></i>Проверяем...</div></div>
           </div>
@@ -308,21 +328,36 @@ tr:hover td{background:#181818;}
 <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore-compat.js"></script>
 <script>
-const FC={apiKey:"AIzaSyCMnA_3RtG39EfV8kSTrNfjNQMX7UC9F6g",authDomain:"gameoff-93b99.firebaseapp.com",projectId:"gameoff-93b99",storageBucket:"gameoff-93b99.firebasestorage.app",messagingSenderId:"964390110488",appId:"1:964390110488:web:a504ba242cf8bdd0d84a6d"};
+const FC={apiKey:"AIzaSyDXkTBDdRFx2Fjeqk0ji4cN5-dbYajyBvE",authDomain:"gameoff-9c1ab.firebaseapp.com",projectId:"gameoff-9c1ab",storageBucket:"gameoff-9c1ab.firebasestorage.app",messagingSenderId:"826520882064",appId:"1:826520882064:web:b5131597db8a59993cc115",measurementId:"G-ZXNZ8DJWMP"};
 firebase.initializeApp(FC);
 const auth=firebase.auth();
 const db=firebase.firestore();
-db.settings({experimentalForceLongPolling:true,merge:true});
-const ADMIN="boyzein28@gmail.com";
-let allUsers=[],allListings=[],allChats=[],allOrders=[],chatMsgUnsub=null;
+try{db.settings({experimentalForceLongPolling:true});}catch(e){}
 
-// Алиасы Firestore
-const col=(name)=>db.collection(name);
-const ref=(colName,id)=>db.collection(colName).doc(id);
-const serverTimestamp=()=>firebase.firestore.FieldValue.serverTimestamp();
+const PROJECT='gameoff-9c1ab';
+const FSBASE=`https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/default/documents`;
+const ADMIN='boyzein28@gmail.com';
+let allUsers=[],allListings=[],allChats=[],allOrders=[],chatMsgUnsub=null;
+function fsDoc2obj(doc){if(!doc||!doc.fields)return null;const obj={};for(const[k,v]of Object.entries(doc.fields)){if(v.stringValue!==undefined)obj[k]=v.stringValue;else if(v.integerValue!==undefined)obj[k]=Number(v.integerValue);else if(v.doubleValue!==undefined)obj[k]=v.doubleValue;else if(v.booleanValue!==undefined)obj[k]=v.booleanValue;else if(v.nullValue!==undefined)obj[k]=null;else if(v.timestampValue!==undefined)obj[k]={toDate:()=>new Date(v.timestampValue),seconds:Math.floor(new Date(v.timestampValue).getTime()/1000)};else if(v.arrayValue)obj[k]=(v.arrayValue.values||[]).map(x=>fsDoc2obj({fields:{_:x}})._);else if(v.mapValue)obj[k]=fsDoc2obj(v.mapValue);}return obj;}
+function obj2fs(obj){const fields={};for(const[k,v]of Object.entries(obj)){if(v===null||v===undefined)fields[k]={nullValue:null};else if(typeof v==='boolean')fields[k]={booleanValue:v};else if(typeof v==='number')fields[k]=Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};else if(typeof v==='string')fields[k]={stringValue:v};else if(v&&typeof v==='object'&&v.serverTimestamp)fields[k]={timestampValue:new Date().toISOString()};else if(Array.isArray(v))fields[k]={arrayValue:{values:v.map(x=>obj2fs({_:x}).fields._)}};else if(v&&typeof v==='object')fields[k]={mapValue:{fields:obj2fs(v).fields}};}return{fields};}
+const serverTimestamp=()=>({serverTimestamp:true});
+
+async function restGet(col,id){const token=await getToken();const h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;const r=await fetch(`${FSBASE}/${col}/${id}`,{headers:h});if(r.status===404)return{exists:false,data:()=>null,id};if(!r.ok)throw new Error('GET '+r.status);const doc=await r.json();const data=fsDoc2obj(doc);return{exists:true,data:()=>data,id:doc.name?.split('/').pop()||id};}
+async function restSet(col,id,data){const token=await getToken();const h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;const keys=Object.keys(data).join('&updateMask.fieldPaths=');const r=await fetch(`${FSBASE}/${col}/${id}?updateMask.fieldPaths=${keys}`,{method:'PATCH',headers:h,body:JSON.stringify(obj2fs(data))});if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.status);}return{id};}
+async function restQuery(col,filters=[],order=null){const token=await getToken();const h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;const sq={from:[{collectionId:col.split('/').pop()}]};if(col.includes('/')){const parts=col.split('/');sq.from=[{collectionId:parts[parts.length-1]}];}if(filters.length===1){const[field,op,val]=filters[0];const om={'==':'EQUAL','array-contains':'ARRAY_CONTAINS'};sq.where={fieldFilter:{field:{fieldPath:field},op:om[op]||'EQUAL',value:obj2fs({v:val}).fields.v}};}else if(filters.length>1){sq.where={compositeFilter:{op:'AND',filters:filters.map(([field,op,val])=>{const om={'==':'EQUAL','array-contains':'ARRAY_CONTAINS'};return{fieldFilter:{field:{fieldPath:field},op:om[op]||'EQUAL',value:obj2fs({v:val}).fields.v}};})}};}if(order)sq.orderBy=[{field:{fieldPath:order.field},direction:order.dir||'ASCENDING'}];let url=`${FSBASE}:runQuery`;if(col.includes('/')){const parts=col.split('/');url=`${FSBASE}/${parts.slice(0,-1).join('/')}:runQuery`;}const r=await fetch(url,{method:'POST',headers:h,body:JSON.stringify({structuredQuery:sq})});if(!r.ok)throw new Error('QUERY '+r.status);const res=await r.json();return(res||[]).filter(x=>x.document).map(x=>({id:x.document.name?.split('/').pop(),...fsDoc2obj(x.document),data:()=>fsDoc2obj(x.document)}));}
+function restOnCollectionSnapshot(col,filters,order,callback){let last=null;async function poll(){try{const docs=await restQuery(col,filters||[],order);const curr=JSON.stringify(docs.map(d=>d.id));if(curr!==last){last=curr;callback({docs:docs.map(d=>({id:d.id,data:()=>d,exists:true}))});}}catch(e){console.warn('poll:',e);}}poll();const t=setInterval(poll,3000);return()=>clearInterval(t);}
+function restOnSnapshot(col,id,cb){let last=null;async function poll(){try{const s=await restGet(col,id);const curr=JSON.stringify(s.data());if(curr!==last){last=curr;cb(s);}}catch(e){}}poll();const t=setInterval(poll,3000);return()=>clearInterval(t);}
 
 function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function fmtD(ts){if(!ts)return'—';try{const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'2-digit',month:'2-digit',year:'2-digit'});}catch{return'—';}}
+
+// Токен авторизации (обновляется после логина)
+let _idToken=null;
+async function getToken(){
+  if(_idToken)return _idToken;
+  try{const u=firebase.auth().currentUser;if(u){_idToken=await u.getIdToken();return _idToken;}}catch(e){}
+  return null;
+}
 
 window.adminLogin=async()=>{
   const e=document.getElementById('adE').value.trim();
@@ -334,17 +369,31 @@ window.adminLogin=async()=>{
   btn.disabled=true;
   btn.innerHTML='<i class="fa fa-spinner fa-spin" style="margin-right:6px"></i>Входим...';
   try{
-    await firebase.auth().signInWithEmailAndPassword(e,p);
+    // REST Auth API — работает без Firebase SDK WebSocket
+    const apiKey='AIzaSyDXkTBDdRFx2Fjeqk0ji4cN5-dbYajyBvE';
+    const resp=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:e,password:p,returnSecureToken:true})
+    });
+    const data=await resp.json();
+    if(!resp.ok)throw{code:data.error?.message||'auth/unknown',message:data.error?.message||'Ошибка входа'};
+    if(data.email!=='boyzein28@gmail.com')throw{code:'auth/not-admin',message:'Нет прав администратора'};
+    _idToken=data.idToken;
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminApp').style.display='block';
+    const emailEl=document.getElementById('adEmail');
+    if(emailEl)emailEl.textContent=data.email||ADMIN;
+    loadAll();
   }catch(ex){
     console.error('Login error:',ex);
     const m={
-      'auth/user-not-found':'Пользователь не найден',
-      'auth/wrong-password':'Неверный пароль',
-      'auth/invalid-credential':'Неверный email или пароль',
-      'auth/invalid-email':'Неверный email',
-      'auth/too-many-requests':'Слишком много попыток, подожди'
+      'EMAIL_NOT_FOUND':'Пользователь не найден',
+      'INVALID_PASSWORD':'Неверный пароль',
+      'INVALID_LOGIN_CREDENTIALS':'Неверный email или пароль',
+      'TOO_MANY_ATTEMPTS_TRY_LATER':'Слишком много попыток, подожди',
+      'auth/not-admin':'Нет прав администратора'
     };
-    err.textContent=m[ex.code]||('['+ex.code+']: '+ex.message);
+    err.textContent=m[ex.code]||(ex.message||'Ошибка входа');
     err.classList.add('on');
   }finally{
     btn.disabled=false;
@@ -386,13 +435,13 @@ const SL={pending:'На проверке',approved:'Активно',rejected:'О
 const SC={pending:'b-yellow',approved:'b-green',rejected:'b-red'};
 
 function loadAll(){
-  db.collection('users').onSnapshot(snap=>{
+  restOnCollectionSnapshot('users',[],null,snap=>{
     allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));
     document.getElementById('s-users').textContent=allUsers.length;
     document.getElementById('s-active').textContent=allUsers.filter(u=>!u.banned).length+' активных';
     renderDashUsers(); renderUsers(allUsers);
   });
-  db.collection('listings').onSnapshot(snap=>{
+  restOnCollectionSnapshot('listings',[],null,snap=>{
     allListings=snap.docs.map(d=>({id:d.id,...d.data()}));
     const pend=allListings.filter(l=>l.status==='pending');
     document.getElementById('s-listings').textContent=allListings.length;
@@ -401,12 +450,12 @@ function loadAll(){
     document.getElementById('modBadge').classList.toggle('on',pend.length>0);
     renderMod(pend); renderListings(allListings); renderDashPending(pend.slice(0,5));
   });
-  db.collection('conversations').onSnapshot(snap=>{
+  restOnCollectionSnapshot('conversations',[],null,snap=>{
     allChats=snap.docs.map(d=>({id:d.id,...d.data()}));
     document.getElementById('s-chats').textContent=allChats.length;
     renderCmList(allChats);
   });
-  db.collection('orders').onSnapshot(snap=>{
+  restOnCollectionSnapshot('orders',[],null,snap=>{
     allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
     document.getElementById('s-orders').textContent=allOrders.length;
     document.getElementById('s-paid').textContent=allOrders.filter(o=>o.status==='paid').length+' оплачено';
@@ -447,12 +496,13 @@ function renderUsers(users){
   tb.innerHTML=users.map(u=>`<tr>
     <td><strong>${esc(u.name||'—')}</strong></td>
     <td style="color:#555;font-size:11px">${esc(u.email||'—')}</td>
-    <td><span class="badge ${u.role==='admin'?'b-red':'b-gray'}">${u.role||'user'}</span></td>
+    <td><span class="badge ${u.role==='admin'?'b-red':u.role==='moder'?'b-yellow':'b-gray'}">${u.role==='admin'?'Админ':u.role==='moder'?'Модер':'Юзер'}</span></td>
     <td><span class="badge ${u.banned?'b-red':'b-green'}">${u.banned?'Заблокирован':'Активен'}</span></td>
     <td style="color:#444">${fmtD(u.createdAt)}</td>
     <td><div class="acts">
+      ${u.role==='moder'?`<button class="act act-v" onclick="setRole('${u.id}','user')"><i class="fa fa-user-minus"></i> Снять</button>`:(u.role!=='admin'?`<button class="act act-v" onclick="setRole('${u.id}','moder')"><i class="fa fa-user-shield"></i> Модер</button>`:'<span style="color:#333;font-size:11px">Админ</span>')}
       ${u.banned?`<button class="act act-ok" onclick="unban('${u.id}')"><i class="fa fa-unlock"></i> Разбан</button>`:`<button class="act act-ban" onclick="ban('${u.id}')"><i class="fa fa-ban"></i> Бан</button>`}
-      <button class="act act-del" onclick="delUser('${u.id}')"><i class="fa fa-trash"></i></button>
+      ${u.role!=='admin'?`<button class="act act-del" onclick="delUser('${u.id}')"><i class="fa fa-trash"></i></button>`:''}
     </div></td>
   </tr>`).join('');
 }
@@ -496,17 +546,27 @@ window.viewCmChat=function(id,el){
   document.getElementById('cmNoSel').style.display='none';
   const msgs=document.getElementById('cmMsgs');msgs.style.display='flex';msgs.innerHTML='';
   if(chatMsgUnsub)chatMsgUnsub();
-  chatMsgUnsub=db.collection('conversations').doc(id).collection('messages').orderBy('ts').onSnapshot(snap=>{
+  chatMsgUnsub=restOnCollectionSnapshot('conversations/'+id+'/messages',[],{field:'ts',dir:'ASCENDING'},snap=>{
+    const docs=snap.docs||[];
     msgs.innerHTML='';
-    if(!snap.size){msgs.innerHTML='<div style="padding:20px;color:#222;text-align:center;font-size:12px">Нет сообщений</div>';return;}
-    snap.forEach(d=>{const m=d.data();const t=m.ts?.toDate?new Date(m.ts.toDate()).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}):'';
-      msgs.innerHTML+=`<div class="cm-msg"><div class="cm-snm">${esc(m.senderName||'?')}</div><div class="cm-bbl">${esc(m.text)}</div><div class="cm-t">${t}</div></div>`;});
+    if(!docs.length){msgs.innerHTML='<div style="padding:20px;color:#555;text-align:center;font-size:12px">Нет сообщений</div>';return;}
+    docs.forEach(d=>{
+      const m=d.data();
+      let t='';
+      try{
+        const ts=m.ts;
+        if(ts?.toDate)t=ts.toDate().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+        else if(ts?.seconds)t=new Date(ts.seconds*1000).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+        else if(typeof ts==='string')t=new Date(ts).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+      }catch{}
+      msgs.innerHTML+=`<div class="cm-msg"><div class="cm-snm">${esc(m.senderName||'?')}</div><div class="cm-bbl">${esc(m.text||'')}</div><div class="cm-t">${t}</div></div>`;
+    });
     msgs.scrollTop=msgs.scrollHeight;
   });
 };
 
-window.approve=async id=>{await db.collection('listings').doc(id).update({status:'approved'});tst('Объявление одобрено и опубликовано');};
-window.reject=async id=>{if(!confirm('Отклонить?'))return;await db.collection('listings').doc(id).update({status:'rejected'});tst('Объявление отклонено');};
+window.approve=async id=>{await restSet('listings',id,{status:'approved'});tst('Объявление одобрено и опубликовано');};
+window.reject=async id=>{if(!confirm('Отклонить?'))return;await restSet('listings',id,{status:'rejected'});tst('Объявление отклонено');};
 
 // ===== ОБЪЯВЛЕНИЕ РЕАЛЬНОГО ВРЕМЕНИ =====
 window.saveAnnounce=async function(){
@@ -515,7 +575,7 @@ window.saveAnnounce=async function(){
   if(!txt){status.style.color='#ff6b6b';status.textContent='Введи текст';return;}
   status.style.color='#888';status.textContent='Сохраняем...';
   try{
-    await db.collection('config').doc('announce').set({
+    await restSet('config','announce',{
       text:txt,
       active:true,
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -529,7 +589,7 @@ window.saveAnnounce=async function(){
 window.clearAnnounce=async function(){
   const status=document.getElementById('announceStatus');
   try{
-    await db.collection('config').doc('announce').set({text:'',active:false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    await restSet('config','announce',{text:'',active:false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
     status.style.color='#4caf50';status.textContent='Убрано с сайта';
     setTimeout(()=>status.textContent='',3000);
   }catch(e){
@@ -537,7 +597,7 @@ window.clearAnnounce=async function(){
   }
 };
 // Слушаем текущее объявление в реальном времени
-db.collection('config').doc('announce').onSnapshot(snap=>{
+restOnSnapshot('config','announce',snap=>{
   const el=document.getElementById('announcePreview');
   if(!el)return;
   if(snap.exists&&snap.data()?.active&&snap.data()?.text){
@@ -554,7 +614,7 @@ window.seedMenziItem=async function(){
   const res=document.getElementById('seedResult');
   res.innerHTML='<span style="color:#888;font-size:13px"><i class="fa fa-spinner fa-spin" style="margin-right:5px"></i>Добавляем...</span>';
   try{
-    await db.collection('listings').doc('menzi_brawlstars_acc_001').set({
+    await restSet('listings','menzi_brawlstars_acc_001',{
       n:'Аккаунт Brawl Stars — 505 кубков',
       g:'Brawl Stars',
       t:'acc',
@@ -573,10 +633,17 @@ window.seedMenziItem=async function(){
     res.innerHTML='<span style="color:#ff6b6b;font-size:13px"><i class="fa fa-exclamation-triangle" style="margin-right:5px"></i>Ошибка: '+e.message+'</span>';
   }
 };
-window.ban=async id=>{if(!confirm('Заблокировать?'))return;await db.collection('users').doc(id).update({banned:true});tst('Пользователь заблокирован');};
-window.unban=async id=>{await db.collection('users').doc(id).update({banned:false});tst('Пользователь разблокирован');};
-window.delUser=async id=>{if(!confirm('Удалить пользователя? Необратимо.'))return;await db.collection('users').doc(id).delete();tst('Удалено');};
-window.delListing=async id=>{if(!confirm('Удалить объявление?'))return;await db.collection('listings').doc(id).delete();tst('Удалено');};
+window.setRole=async(id,role)=>{if(!confirm(role==='moder'?'Назначить модератором?':'Снять роль модератора?'))return;await restSet('users',id,{role});tst(role==='moder'?'Назначен модератором':'Роль снята');};
+
+window.ban=async id=>{
+  const reason=prompt('Причина блокировки (необязательно):','Нарушение правил платформы');
+  if(reason===null)return;
+  await restSet('users',id,{banned:true, banReason:reason||'Нарушение правил платформы', bannedAt:new Date().toISOString()});
+  tst('Пользователь заблокирован');
+};
+window.unban=async id=>{await restSet('users',id,{banned:false,banReason:'',bannedAt:''});tst('Пользователь разблокирован');};
+window.delUser=async id=>{if(!confirm('Удалить пользователя? Необратимо.'))return;await fetch(`${FSBASE}/users/${id}`,{method:'DELETE',headers:{Authorization:'Bearer '+await getToken()}});tst('Удалено');};
+window.delListing=async id=>{if(!confirm('Удалить объявление?'))return;await fetch(`${FSBASE}/listings/${id}`,{method:'DELETE',headers:{Authorization:'Bearer '+await getToken()}});tst('Удалено');};
 window.filterUsers=q=>{renderUsers(q?allUsers.filter(u=>(u.name||'').toLowerCase().includes(q.toLowerCase())||(u.email||'').toLowerCase().includes(q.toLowerCase())):allUsers);};
 window.filterListings=q=>{renderListings(q?allListings.filter(l=>(l.n||'').toLowerCase().includes(q.toLowerCase())):allListings);};
 
